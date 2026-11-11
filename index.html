@@ -89,6 +89,7 @@
             pointer-events: none;
             display: flex;
             flex-direction: column;
+            justify-space-between: space-between;
             justify-content: space-between;
             padding: 15px;
         }
@@ -98,8 +99,8 @@
         }
 
         /* Glassmorphic Panels */
-        .panel {
 
+        .panel {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
@@ -118,8 +119,8 @@
         .hud-header {
             width: 100%;
             display: flex;
-            justify-content: space-between;
 
+            justify-content: space-between;
             align-items: center;
             gap: 10px;
         }
@@ -138,8 +139,8 @@
         .stats-container {
             display: flex;
             gap: 10px;
-        }
 
+        }
 
         .stat-box {
             display: flex;
@@ -158,9 +159,9 @@
             font-size: 18px;
             font-weight: 700;
             color: var(--neon-gold);
+
             text-shadow: 0 0 8px rgba(255,170,0,0.4);
         }
-
         .stat-value.cyan {
             color: var(--neon-cyan);
             text-shadow: 0 0 8px rgba(0,243,255,0.4);
@@ -178,9 +179,9 @@
             border: 1px solid var(--neon-cyan);
             color: #fff;
             font-family: var(--font-display);
+
             font-size: 11px;
             font-weight: 700;
-
             text-transform: uppercase;
             padding: 8px 14px;
             border-radius: 6px;
@@ -198,9 +199,9 @@
             transform: translateY(-2px);
         }
         .btn:active { transform: translateY(0); }
+
         .btn-gold {
             border-color: var(--neon-gold);
-
             background: rgba(255, 170, 0, 0.1);
         }
         .btn-gold:hover {
@@ -218,9 +219,9 @@
         }
 
         /* Planet Info Panel */
+
         .planet-card {
             width: 320px;
-
             position: absolute;
             left: 20px;
             top: 90px;
@@ -238,9 +239,9 @@
             color: #fff;
             margin-bottom: 3px;
             text-transform: uppercase;
+
         }
         .planet-type {
-
             font-size: 12px;
             color: var(--neon-cyan);
             text-transform: uppercase;
@@ -258,9 +259,9 @@
         }
         .planet-stats {
             border-top: 1px solid rgba(255,255,255,0.1);
+
             padding-top: 10px;
             margin-bottom: 15px;
-
         }
         .p-stat-row {
             display: flex;
@@ -278,9 +279,9 @@
             left: 0;
             width: 100%;
             height: 100%;
+
             background: rgba(2, 2, 8, 0.85);
             backdrop-filter: blur(8px);
-
             z-index: 100;
             display: flex;
             justify-content: center;
@@ -298,9 +299,9 @@
             width: 90%;
             max-width: 480px;
             text-align: center;
+
             position: relative;
         }
-
         .modal-content h2 {
             font-family: var(--font-display);
             font-size: 24px;
@@ -318,9 +319,9 @@
         }
         .arcade-item {
             border: 1px solid rgba(255,255,255,0.1);
+
             background: rgba(255,255,255,0.03);
             border-radius: 8px;
-
             padding: 12px;
             display: flex;
             justify-content: space-between;
@@ -338,8 +339,8 @@
         .arcade-info p {
             font-size: 12px;
             color: rgba(255,255,255,0.6);
-        }
 
+        }
 
         /* Settings Toggle Matrix */
         .settings-list {
@@ -358,9 +359,9 @@
         #arcade-hud {
             position: absolute;
             top: 75px;
+
             left: 50%;
             transform: translateX(-50%);
-
             width: 90%;
             max-width: 600px;
             display: none;
@@ -378,9 +379,9 @@
             min-width: 100px;
         }
         .rush-metric .val {
+
             font-size: 18px;
             font-weight: 700;
-
             color: #fff;
         }
         .rush-metric .val.bonus { color: var(--neon-gold); }
@@ -398,9 +399,9 @@
         .controls-hint {
             font-size: 13px;
             color: rgba(255,255,255,0.5);
+
             display: flex;
             gap: 12px;
-
         }
         .key-cap {
             background: rgba(255,255,255,0.15);
@@ -412,15 +413,15 @@
             color: #fff;
         }
 
-        /* Mobile Controls Virtual Interface - Always Ready on Touch or Small Screens */
+        /* Mobile Controls Virtual Interface */
         .mobile-touch-pane {
-            display: flex; /* Always display but handled responsively or overlayed */
+            display: flex;
             width: 100%;
             justify-content: space-between;
             pointer-events: none;
+
             padding: 0 5px 5px 5px;
         }
-
         .dpad-container {
             width: 110px;
             height: 110px;
@@ -438,9 +439,9 @@
             border-radius: 50%;
             position: absolute;
             top: 31px;
+
             left: 31px;
             box-shadow: 0 0 15px var(--neon-cyan);
-
             cursor: pointer;
         }
         .action-button-pane {
@@ -458,9 +459,9 @@
             color: #fff;
             font-family: var(--font-display);
             font-weight: 700;
+
             font-size: 11px;
             display: flex;
-
             justify-content: center;
             align-items: center;
             box-shadow: 0 0 10px rgba(0,243,255,0.2);
@@ -478,16 +479,16 @@
         }
         .circle-action-btn.gold:active {
             background: var(--neon-gold);
+
             color: #000;
             box-shadow: 0 0 20px var(--neon-gold);
-
         }
 
         /* Screen state responsiveness modifications */
         @media (max-width: 768px) {
             .controls-hint { display: none; }
             .brand-title { font-size: 16px; }
-            .hud-actions .btn:not(#btn-fullscreen-hud) { display: none; } /* keep fullscreen handy on header mobile */
+            .hud-actions .btn:not(#btn-fullscreen-hud) { display: none; }
             .planet-card {
                 width: calc(100% - 10px);
                 top: auto;
@@ -499,8 +500,8 @@
 </head>
 <body>
 
-    <!-- Fallback Screen for lack of WebGL -->
 
+    <!-- Fallback Screen for lack of WebGL -->
     <div id="webgl-fallback" class="hidden">
         <h1>Critical Core Alert</h1>
         <p>Your systems/browser architecture does not support WebGL 3D rendering accelerates.</p>
@@ -519,8 +520,8 @@
             </div>
             
             <div class="stats-container">
-                <div class="panel stat-box">
 
+                <div class="panel stat-box">
                     <div class="stat-label">Vault</div>
                     <div id="hud-crystal-bank" class="stat-value">0000</div>
                 </div>
@@ -539,8 +540,8 @@
         </header>
 
         <!-- Crystal Rush Game HUD -->
-        <div id="arcade-hud" class="interactive">
 
+        <div id="arcade-hud" class="interactive">
             <div class="rush-metric">
                 <div class="val timer" id="rush-timer">75.0s</div>
             </div>
@@ -559,8 +560,8 @@
             <div class="panel planet-card interactive" id="proximity-planet-panel">
                 <h2 id="lbl-planet-name">Planet Name</h2>
                 <div id="lbl-planet-type" class="planet-type">Class-M Planet</div>
-                <p id="lbl-planet-desc" class="planet-desc">Detailed analytics description...</p>
 
+                <p id="lbl-planet-desc" class="planet-desc">Detailed analytics description...</p>
                 <div class="planet-stats">
                     <div class="p-stat-row">
                         <span class="p-stat-lbl">Atmosphere</span>
@@ -579,12 +580,12 @@
         <!-- Footer / Mechanical Mobile Joystick Elements -->
         <footer class="hud-footer">
             <div class="panel controls-hint">
-                <div><span class="key-cap">W</span><span class="key-cap">A</span><span class="key-cap">S</span><span class="key-cap">D</span> Thruster Navigation</div>
 
+                <div><span class="key-cap">W</span><span class="key-cap">A</span><span class="key-cap">S</span><span class="key-cap">D</span> Thruster Navigation</div>
                 <div><span class="key-cap">⛶</span> Tap Fullscreen for immersive Mobile Play</div>
             </div>
 
-            <!-- Mobile Touch Layout Framework - Unified for tablet/mobile interaction -->
+            <!-- Mobile Touch Layout Framework -->
             <div class="mobile-touch-pane">
                 <div class="dpad-container" id="virtual-joystick-bound">
                     <div class="touch-joystick" id="virtual-joystick-handle"></div>
@@ -599,8 +600,8 @@
     </div>
 
     <!-- Modals Overlay Blocks -->
-    <div class="modal-overlay" id="modal-pause">
 
+    <div class="modal-overlay" id="modal-pause">
         <div class="panel modal-content interactive">
             <h2>Systems Suspended</h2>
             <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
@@ -619,8 +620,8 @@
                     <span>Audio Oscillators</span>
                     <button class="btn btn-gold" id="toggle-audio-fx" style="padding: 5px 12px;">ENABLED</button>
                 </div>
-                <div class="settings-row">
 
+                <div class="settings-row">
                     <span>Hyperdrive Density</span>
                     <button class="btn" id="toggle-graphics-perf" style="padding: 5px 12px;">HIGH DETAILED</button>
                 </div>
@@ -639,8 +640,8 @@
                         <h3>Crystal Rush 3D</h3>
                         <p>High speed asteroid-lane navigation crystal aggregator.</p>
                         <p style="font-size: 11px; color: var(--neon-gold); margin-top: 4px;">Record: <span id="lbl-high-score">0000</span> pts</p>
-                    </div>
 
+                    </div>
                     <button class="btn btn-gold" id="btn-launch-crystalrush">Launch</button>
                 </div>
             </div>
@@ -659,8 +660,8 @@
                 if (!this.enabled) return;
                 this.init();
                 try {
-                    const osc = this.ctx.createOscillator();
 
+                    const osc = this.ctx.createOscillator();
                     const gain = this.ctx.createGain();
                     osc.connect(gain); gain.connect(this.ctx.destination);
                     const now = this.ctx.currentTime;
@@ -679,8 +680,8 @@
                         osc.frequency.exponentialRampToValueAtTime(700, now + 0.35);
                         gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
                         osc.start(now); osc.stop(now + 0.4);
-                    } else if (type === 'click') {
 
+                    } else if (type === 'click') {
                         osc.type = 'sine'; osc.frequency.setValueAtTime(900, now);
                         gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
                         osc.start(now); osc.stop(now + 0.04);
@@ -699,11 +700,11 @@
                 id: 4,
                 name: "Twitch Glitch Nexus",
                 type: "3D Interland Platform Matrix",
-                desc: "A stylized geometric network built entirely from vibrant low-poly purple floating voxel prisms, glowing stream conduits, and neon sub-islands.",
 
+                desc: "A stylized geometric network built entirely from vibrant low-poly purple floating voxel prisms, glowing stream conduits, and neon sub-islands.",
                 atmosphere: "Hypermedia Streaming Grid",
                 hazard: "Anomalous Glitch De-synchronization",
-                color: 0x9146ff, // Twitch Purple
+                color: 0x9146ff,
                 radius: 5.2,
                 pos: { x: -42, z: 12 },
                 isInterland: true
@@ -719,8 +720,8 @@
                 this.highScore = parseInt(localStorage.getItem('ge_highscore')) || 0;
                 document.getElementById('hud-crystal-bank').innerText = String(this.crystalBank).padStart(4, '0');
                 document.getElementById('lbl-high-score').innerText = String(this.highScore).padStart(4, '0');
-            },
 
+            },
             addCrystals(qty) {
                 this.crystalBank += qty; localStorage.setItem('ge_crystals', this.crystalBank);
                 document.getElementById('hud-crystal-bank').innerText = String(this.crystalBank).padStart(4, '0');
@@ -739,9 +740,8 @@
         
         const player = { mesh: null, pos: { x: 0, z: 0 }, speed: 0.52, rotation: 0, targetRotation: 0 };
         const keys = { w:0, a:0, s:0, d:0, ArrowUp:0, ArrowLeft:0, ArrowDown:0, ArrowRight:0 };
-        
 
-        // Touch Joystick State Trackers
+        
         let joystickActive = false;
         let joystickStart = { x: 0, y: 0 };
         let joystickCurrent = { x: 0, y: 0 };
@@ -844,7 +844,6 @@
 
             addGlobalBackground(GameState.graphicsHigh ? 1.0 : 0.4);
 
-            // Center Matrix Futuristic Space Station
             spaceStation = new THREE.Group();
             const coreMesh = new THREE.Mesh(new THREE.SphereGeometry(3.2, 16, 16), new THREE.MeshStandardMaterial({ color: 0x1d2936, metalness: 0.9, roughness: 0.1, emissive: 0x001122 }));
             spaceStation.add(coreMesh);
@@ -852,21 +851,18 @@
             stationRing.rotation.x = Math.PI / 2; spaceStation.add(stationRing);
             spaceStation.position.set(0, 0, 0); scene.add(spaceStation);
 
-            // Compile Stellar Worlds List
             PLANET_CATALOG.forEach((pData) => {
                 const pGroup = new THREE.Group();
                 pGroup.position.set(pData.pos.x, 0, pData.pos.z);
                 
                 if (pData.isInterland) {
-                    // Custom 3D Interland low-poly voxel citadel arrangement
                     const centerCoreBlock = new THREE.Mesh(
                         new THREE.BoxGeometry(pData.radius * 1.2, pData.radius * 1.2, pData.radius * 1.2),
-
                         new THREE.MeshStandardMaterial({ color: 0x9146ff, roughness: 0.2, flatShading: true, emissive: 0x1a0533 })
                     );
                     pGroup.add(centerCoreBlock);
 
-                    // Add surrounding floating low-poly islet blocks
+
                     const subIslandsCount = 5;
                     for (let s = 0; s < subIslandsCount; s++) {
                         const blockW = 1.5 + Math.random() * 2;
@@ -881,13 +877,12 @@
                         const angle = (s / subIslandsCount) * Math.PI * 2;
                         const orbitDist = pData.radius + 2.0;
                         subBlock.position.set(Math.cos(angle) * orbitDist, (Math.random() - 0.5) * 2, Math.sin(angle) * orbitDist);
-
                         subBlock.rotation.set(Math.random(), Math.random(), 0);
                         pGroup.add(subBlock);
                     }
                 } else {
-                    // Standard structural planetary body shapes
                     const segs = GameState.graphicsHigh ? 24 : 12;
+
                     const planetMesh = new THREE.Mesh(
                         new THREE.SphereGeometry(pData.radius, segs, segs),
                         new THREE.MeshStandardMaterial({ color: pData.color, metalness: 0.3, roughness: 0.6, flatShading: pData.id === 5 })
@@ -895,21 +890,19 @@
                     pGroup.add(planetMesh);
                 }
 
-                // Glowing Proximity Activation Rings
                 const portal = new THREE.Mesh(
                     new THREE.TorusGeometry(pData.radius + 3.8, 0.08, 4, 20),
                     new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.35, wireframe: true })
                 );
                 portal.rotation.x = Math.PI / 2; pGroup.add(portal);
-
                 portalRings.push(portal);
 
                 scene.add(pGroup);
                 planetMeshes.push({ id: pData.id, group: pGroup, interactionRadius: pData.radius + 3.8, data: pData });
             });
 
-            // Build structural representation for Player's starship vessel element
             player.mesh = new THREE.Group();
+
             const shipBody = new THREE.Mesh(new THREE.ConeGeometry(0.5, 2.0, 10), new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.7 }));
             shipBody.rotateX(Math.PI / 2); player.mesh.add(shipBody);
             
@@ -921,7 +914,6 @@
 
             camera.position.set(player.pos.x, 15, player.pos.z + 18);
             camera.lookAt(player.mesh.position);
-
         }
 
         function buildArcadeScene() {
@@ -930,6 +922,7 @@
 
             const trackLength = 300;
             const trackFloor = new THREE.Mesh(new THREE.BoxGeometry(24, 0.15, trackLength), new THREE.MeshStandardMaterial({ color: 0x0a0f24, transparent: true, opacity: 0.85 }));
+
             trackFloor.position.set(0, -1, -trackLength / 2 + 10); scene.add(trackFloor);
 
             for(let laneX of [-12, -4, 4, 12]) {
@@ -942,7 +935,6 @@
             racer.rotateX(Math.PI / 2); player.mesh.add(racer);
             player.mesh.position.set(0, 0, 0); scene.add(player.mesh);
 
-
             camera.position.set(0, 4.2, 7.0); camera.lookAt(new THREE.Vector3(0, 1, -10));
         }
 
@@ -950,6 +942,7 @@
             const lane = Math.floor(Math.random() * 3) - 1;
             const spawnZ = -175;
             const isGem = Math.random() > 0.45;
+
             let mesh;
 
             if (isGem) {
@@ -963,7 +956,6 @@
             scene.add(mesh); CrystalRush.entities.push(mesh);
         }
 
-
         function executeFramePulse() {
             requestAnimationFrame(executeFramePulse);
             if (GameState.current === 'HUB') updateHubSimulation();
@@ -971,19 +963,17 @@
             renderer.render(scene, camera);
         }
 
+
         function updateHubSimulation() {
             if(starfield) starfield.rotation.y += 0.0002;
             if(spaceDust) spaceDust.rotation.y -= 0.0004;
             if(spaceStation) spaceStation.rotation.y += 0.003;
 
             planetMeshes.forEach((pObj, idx) => {
-                // Rotate standard or custom Interland components
                 pObj.group.children[0].rotation.y += 0.005 + (idx * 0.001);
                 if (pObj.data.isInterland) {
-                    // Make low poly platforms float up and down slightly
                     for (let c = 1; c < pObj.group.children.length - 1; c++) {
                         pObj.group.children[c].position.y = Math.sin(Date.now() * 0.002 + c) * 0.4;
-
                         pObj.group.children[c].rotation.x += 0.005;
                     }
                 }
@@ -994,6 +984,7 @@
                 }
             });
 
+
             let moveX = 0, moveZ = 0;
             if (keys.w || keys.ArrowUp) moveZ -= 1;
             if (keys.s || keys.ArrowDown) moveZ += 1;
@@ -1003,7 +994,6 @@
             if (joystickActive) {
                 moveX = Math.max(-1, Math.min(1, (joystickCurrent.x - joystickStart.x) / joystickMaxDrag));
                 moveZ = Math.max(-1, Math.min(1, (joystickCurrent.y - joystickStart.y) / joystickMaxDrag));
-
             }
 
             if (moveX !== 0 || moveZ !== 0) {
@@ -1014,6 +1004,7 @@
                 while (diff < -Math.PI) diff += Math.PI * 2; while (diff > Math.PI) diff -= Math.PI * 2;
                 player.rotation += diff * 0.16; player.mesh.rotation.y = player.rotation;
                 player.mesh.rotation.z = -moveX * 0.22;
+
             } else {
                 player.mesh.rotation.z *= 0.8;
             }
@@ -1022,7 +1013,6 @@
             player.pos.x = Math.max(-bound, Math.min(bound, player.pos.x));
             player.pos.z = Math.max(-bound, Math.min(bound, player.pos.z));
             player.mesh.position.set(player.pos.x, 0.15, player.pos.z);
-
 
             camera.position.x += (player.pos.x - camera.position.x) * 0.08;
             camera.position.z += ((player.pos.z + 19) - camera.position.z) * 0.08;
@@ -1034,6 +1024,7 @@
                 const p = planetMeshes[i];
                 const dx = player.pos.x - p.group.position.x; const dz = player.pos.z - p.group.position.z;
                 if (Math.sqrt(dx*dx + dz*dz) < p.interactionRadius) { activeNode = p; break; }
+
             }
 
             const card = document.getElementById('proximity-planet-panel');
@@ -1043,11 +1034,9 @@
                     document.getElementById('lbl-planet-name').innerText = activeNode.data.name;
                     document.getElementById('lbl-planet-type').innerText = activeNode.data.type;
                     document.getElementById('lbl-planet-desc').innerText = activeNode.data.desc;
-
                     document.getElementById('lbl-planet-atm').innerText = activeNode.data.atmosphere;
                     document.getElementById('lbl-planet-hazard').innerText = activeNode.data.hazard;
                     
-                    // Add distinctive styling logic for Twitch Interland module interface
                     if (activeNode.data.isInterland) {
                         card.classList.add('twitch-theme');
                     } else {
@@ -1055,6 +1044,7 @@
                     }
                     card.style.display = 'block';
                     activeNode.group.children[activeNode.group.children.length - 1].material.color.setHex(0x00f3ff);
+
                 }
             } else if (GameState.activePlanet !== null) {
                 planetMeshes.forEach(p => p.group.children[p.group.children.length - 1].material.color.setHex(0xffaa00));
@@ -1063,7 +1053,6 @@
         }
 
         function updateArcadeSimulation() {
-
             if(starfield) starfield.rotation.z += 0.001;
             if(CrystalRush.timeLeft > 0) {
                 CrystalRush.timeLeft -= 0.01667;
@@ -1075,6 +1064,7 @@
                 document.getElementById('rush-timer').innerText = CrystalRush.timeLeft.toFixed(1) + "s";
             }
 
+
             if(CrystalRush.boostActive) {
                 CrystalRush.boostTimer -= 0.01667;
                 camera.position.x = (Math.random() - 0.5) * 0.12;
@@ -1083,7 +1073,6 @@
                     document.getElementById('rush-boost').innerText = "DEPLETED";
                     document.getElementById('rush-boost').className = "val";
                 }
-
             } else { camera.position.x = 0; }
 
             if (keys.a || keys.ArrowLeft) CrystalRush.lane = -1;
@@ -1095,6 +1084,7 @@
             player.mesh.rotation.z = -(player.mesh.position.x - targetX) * 0.12;
 
             CrystalRush.spawnTimer++;
+
             if(CrystalRush.spawnTimer >= (CrystalRush.boostActive ? 12 : 24)) {
                 CrystalRush.spawnTimer = 0; spawnArcadeEntity();
             }
@@ -1102,7 +1092,6 @@
             for (let i = CrystalRush.entities.length - 1; i >= 0; i--) {
                 const ent = CrystalRush.entities[i]; ent.position.z += CrystalRush.speed;
                 if(ent.userData.type === 'ASTEROID') ent.rotation.x += ent.userData.rotSpeed;
-
 
                 if(!ent.userData.hit && ent.position.z >= -0.8 && ent.position.z <= 1.2) {
                     if(Math.abs(ent.position.x - player.mesh.position.x) < (ent.userData.radius + 0.5)) {
@@ -1115,6 +1104,7 @@
                 }
                 if(ent.position.z > 10) { scene.remove(ent); CrystalRush.entities.splice(i, 1); }
             }
+
         }
 
         function triggerRequestFullscreen() {
@@ -1122,7 +1112,6 @@
             const docEl = document.documentElement;
             const requestFS = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
             const exitFS = document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen;
-
 
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 if (requestFS) requestFS.call(docEl).catch(() => {});
@@ -1135,15 +1124,14 @@
             window.addEventListener('keydown', (e) => {
                 if(e.key === 'Escape' || e.key === 'Esc') { toggleModal('modal-pause'); return; }
                 const lower = e.key.toLowerCase(); if(lower in keys) keys[lower] = 1; if(e.key in keys) keys[e.key] = 1;
+
             });
             window.addEventListener('keyup', (e) => {
                 const lower = e.key.toLowerCase(); if(lower in keys) keys[lower] = 0; if(e.key in keys) keys[e.key] = 0;
             });
 
-            // Enhanced Mobile D-Pad Touch Interface with scrolling lockouts
             const bound = document.getElementById('virtual-joystick-bound');
             const handle = document.getElementById('virtual-joystick-handle');
-
 
             const handleTouchStart = (e) => {
                 e.preventDefault(); joystickActive = true;
@@ -1156,6 +1144,7 @@
                 const t = e.touches[0]; joystickCurrent = { x: t.clientX, y: t.clientY };
                 let dx = joystickCurrent.x - joystickStart.x; let dy = joystickCurrent.y - joystickStart.y;
                 const dist = Math.sqrt(dx*dx + dy*dy);
+
                 if(dist > joystickMaxDrag) { dx = (dx / dist) * joystickMaxDrag; dy = (dy / dist) * joystickMaxDrag; }
                 handle.style.transform = `translate(${dx}px, ${dy}px)`;
             };
@@ -1165,12 +1154,10 @@
                 keys.w = keys.a = keys.s = keys.d = 0;
             };
 
-
             bound.addEventListener('touchstart', handleTouchStart, { passive: false });
             bound.addEventListener('touchmove', handleTouchMove, { passive: false });
             bound.addEventListener('touchend', handleTouchEnd); bound.addEventListener('touchcancel', handleTouchEnd);
 
-            // Bind Interface Buttons Action Hooks
             document.getElementById('mobile-action-primary').addEventListener('click', () => {
                 if(GameState.current === 'HUB' && GameState.activePlanet) triggerOrbitScan();
             });
@@ -1178,14 +1165,13 @@
                 if(GameState.current === 'CRYSTAL_RUSH') CrystalRush.triggerBoost();
             });
 
-            // Action Triggers Linkups
+
             document.getElementById('btn-fullscreen-hud').addEventListener('click', triggerRequestFullscreen);
             document.getElementById('btn-modal-fullscreen').addEventListener('click', triggerRequestFullscreen);
             
             document.getElementById('btn-arcade-menu').addEventListener('click', () => toggleModal('modal-arcade'));
             document.getElementById('btn-close-arcade').addEventListener('click', () => toggleModal('modal-arcade'));
             document.getElementById('btn-settings-toggle').addEventListener('click', () => toggleModal('modal-settings'));
-
             document.getElementById('btn-close-settings').addEventListener('click', () => toggleModal('modal-settings'));
             document.getElementById('btn-pause-toggle').addEventListener('click', () => toggleModal('modal-pause'));
             document.getElementById('btn-resume-sim').addEventListener('click', () => toggleModal('modal-pause'));
@@ -1199,23 +1185,27 @@
                 GameState.graphicsHigh = !GameState.graphicsHigh; this.innerText = GameState.graphicsHigh ? "HIGH DETAILED" : "ENERGY SAVING";
                 AudioFX.play('click');
                 if(GameState.current === 'HUB') buildHubScene(); else if(GameState.current === 'CRYSTAL_RUSH') buildArcadeScene();
+
             });
         }
 
         function triggerOrbitScan() {
             if(!GameState.activePlanet) return; AudioFX.play('boost');
             alert(`Synchronizing orbital network coordinates with ${GameState.activePlanet.name}.\nAtmospheric analysis: ${GameState.activePlanet.atmosphere}. Quantum tracking reward obtained.`);
-
             GameState.addCrystals(250);
         }
 
         function toggleModal(id) {
             AudioFX.play('click'); const el = document.getElementById(id);
             if(el.classList.contains('active')) el.classList.remove('active');
-            else { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active')); el.add('active'); }
+            else { 
+                document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active')); 
+                el.classList.add('active'); 
+            }
         }
 
         window.onload = function() {
+
             GameState.initStorage();
             if (initGraphicsEngine()) { buildHubScene(); registerControlHandlers(); executeFramePulse(); }
         };
