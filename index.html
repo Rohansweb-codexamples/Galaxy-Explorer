@@ -1074,16 +1074,26 @@
                 }
             } else { camera.position.x = 0; }
 
-            if (keys.a || keys.ArrowLeft) CrystalRush.lane = -1;
-            if (keys.d || keys.ArrowRight) CrystalRush.lane = 1;
-            if (keys.w || keys.s || keys.ArrowUp || keys.ArrowDown) CrystalRush.lane = 0;
+            let targetLane = CrystalRush.lane;
+            if (keys.a || keys.ArrowLeft) targetLane = -1;
+            else if (keys.d || keys.ArrowRight) targetLane = 1;
+            else if (keys.w || keys.s || keys.ArrowUp || keys.ArrowDown) targetLane = 0;
+
+            // Map mobile virtual touch D-pad drag coordinates to arcade lanes seamlessly
+            if (joystickActive) {
+                const dragDeltaX = joystickCurrent.x - joystickStart.x;
+                if (dragDeltaX < -15) targetLane = -1;
+
+                else if (dragDeltaX > 15) targetLane = 1;
+                else targetLane = 0;
+            }
+            CrystalRush.lane = targetLane;
 
             const targetX = CrystalRush.lane * CrystalRush.laneWidth;
             player.mesh.position.x += (targetX - player.mesh.position.x) * 0.22;
             player.mesh.rotation.z = -(player.mesh.position.x - targetX) * 0.12;
 
             CrystalRush.spawnTimer++;
-
             if(CrystalRush.spawnTimer >= (CrystalRush.boostActive ? 12 : 24)) {
                 CrystalRush.spawnTimer = 0; spawnArcadeEntity();
             }
@@ -1093,6 +1103,7 @@
                 if(ent.userData.type === 'ASTEROID') ent.rotation.x += ent.userData.rotSpeed;
 
                 if(!ent.userData.hit && ent.position.z >= -0.8 && ent.position.z <= 1.2) {
+
                     if(Math.abs(ent.position.x - player.mesh.position.x) < (ent.userData.radius + 0.5)) {
                         ent.userData.hit = true;
                         if(ent.userData.type === 'GEM') { CrystalRush.score += 100; AudioFX.play('collect'); }
@@ -1103,7 +1114,6 @@
                 }
                 if(ent.position.z > 10) { scene.remove(ent); CrystalRush.entities.splice(i, 1); }
             }
-
         }
 
         function triggerRequestFullscreen() {
@@ -1113,6 +1123,7 @@
             const exitFS = document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen;
 
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+
                 if (requestFS) requestFS.call(docEl).catch(() => {});
             } else {
                 if (exitFS) exitFS.call(document);
@@ -1123,8 +1134,6 @@
             window.addEventListener('keydown', (e) => {
                 if(e.key === 'Escape' || e.key === 'Esc') { toggleModal('modal-pause'); return; }
                 
-
-                // Intercept and halt keyboard scrolling rules instantly
                 if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Spacebar'].includes(e.key)) {
                     e.preventDefault();
                 }
@@ -1134,6 +1143,7 @@
                 if(lower in keys) keys[lower] = 1;
 
                 if(e.key === ' ' || e.code === 'Space') {
+
                     if(GameState.current === 'CRYSTAL_RUSH') {
                         CrystalRush.triggerBoost();
                     }
@@ -1143,7 +1153,6 @@
             window.addEventListener('keyup', (e) => {
                 if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Spacebar'].includes(e.key)) {
                     e.preventDefault();
-
                 }
                 if(e.key in keys) keys[e.key] = 0;
                 const lower = e.key.toLowerCase();
@@ -1154,6 +1163,7 @@
             const handle = document.getElementById('virtual-joystick-handle');
 
             const handleTouchStart = (e) => {
+
                 e.preventDefault(); joystickActive = true;
                 const t = e.touches[0]; joystickStart = { x: t.clientX, y: t.clientY };
                 joystickCurrent = { x: t.clientX, y: t.clientY }; AudioFX.play('click');
@@ -1163,7 +1173,6 @@
                 if(!joystickActive) return; e.preventDefault();
                 const t = e.touches[0]; joystickCurrent = { x: t.clientX, y: t.clientY };
                 let dx = joystickCurrent.x - joystickStart.x; let dy = joystickCurrent.y - joystickStart.y;
-
                 const dist = Math.sqrt(dx*dx + dy*dy);
                 if(dist > joystickMaxDrag) { dx = (dx / dist) * joystickMaxDrag; dy = (dy / dist) * joystickMaxDrag; }
                 handle.style.transform = `translate(${dx}px, ${dy}px)`;
@@ -1174,6 +1183,7 @@
                 keys.w = keys.a = keys.s = keys.d = 0;
             };
 
+
             bound.addEventListener('touchstart', handleTouchStart, { passive: false });
             bound.addEventListener('touchmove', handleTouchMove, { passive: false });
             bound.addEventListener('touchend', handleTouchEnd); bound.addEventListener('touchcancel', handleTouchEnd);
@@ -1183,7 +1193,6 @@
             });
             document.getElementById('mobile-action-boost').addEventListener('click', () => {
                 if(GameState.current === 'CRYSTAL_RUSH') CrystalRush.triggerBoost();
-
             });
 
             document.getElementById('btn-fullscreen-hud').addEventListener('click', triggerRequestFullscreen);
@@ -1194,6 +1203,7 @@
             document.getElementById('btn-settings-toggle').addEventListener('click', () => toggleModal('modal-settings'));
             document.getElementById('btn-close-settings').addEventListener('click', () => toggleModal('modal-settings'));
             document.getElementById('btn-pause-toggle').addEventListener('click', () => toggleModal('modal-pause'));
+
             document.getElementById('btn-resume-sim').addEventListener('click', () => toggleModal('modal-pause'));
             document.getElementById('btn-launch-crystalrush').addEventListener('click', () => { toggleModal('modal-arcade'); CrystalRush.launch(); });
             document.getElementById('btn-enter-world').addEventListener('click', triggerOrbitScan);
@@ -1203,7 +1213,6 @@
             });
             document.getElementById('toggle-graphics-perf').addEventListener('click', function() {
                 GameState.graphicsHigh = !GameState.graphicsHigh; this.innerText = GameState.graphicsHigh ? "HIGH DETAILED" : "ENERGY SAVING";
-
                 AudioFX.play('click');
                 if(GameState.current === 'HUB') buildHubScene(); else if(GameState.current === 'CRYSTAL_RUSH') buildArcadeScene();
             });
@@ -1215,6 +1224,7 @@
             GameState.addCrystals(250);
         }
 
+
         function toggleModal(id) {
             AudioFX.play('click'); const el = document.getElementById(id);
             if(el.classList.contains('active')) el.classList.remove('active');
@@ -1223,7 +1233,6 @@
                 el.classList.add('active'); 
             }
         }
-
 
         window.onload = function() {
             GameState.initStorage();
