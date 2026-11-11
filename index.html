@@ -89,7 +89,6 @@
             pointer-events: none;
             display: flex;
             flex-direction: column;
-            justify-space-between: space-between;
             justify-content: space-between;
             padding: 15px;
         }
@@ -99,8 +98,8 @@
         }
 
         /* Glassmorphic Panels */
-
         .panel {
+
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
@@ -119,8 +118,8 @@
         .hud-header {
             width: 100%;
             display: flex;
-
             justify-content: space-between;
+
             align-items: center;
             gap: 10px;
         }
@@ -139,8 +138,8 @@
         .stats-container {
             display: flex;
             gap: 10px;
-
         }
+
 
         .stat-box {
             display: flex;
@@ -159,9 +158,9 @@
             font-size: 18px;
             font-weight: 700;
             color: var(--neon-gold);
-
             text-shadow: 0 0 8px rgba(255,170,0,0.4);
         }
+
         .stat-value.cyan {
             color: var(--neon-cyan);
             text-shadow: 0 0 8px rgba(0,243,255,0.4);
@@ -179,9 +178,9 @@
             border: 1px solid var(--neon-cyan);
             color: #fff;
             font-family: var(--font-display);
-
             font-size: 11px;
             font-weight: 700;
+
             text-transform: uppercase;
             padding: 8px 14px;
             border-radius: 6px;
@@ -199,9 +198,9 @@
             transform: translateY(-2px);
         }
         .btn:active { transform: translateY(0); }
-
         .btn-gold {
             border-color: var(--neon-gold);
+
             background: rgba(255, 170, 0, 0.1);
         }
         .btn-gold:hover {
@@ -219,9 +218,9 @@
         }
 
         /* Planet Info Panel */
-
         .planet-card {
             width: 320px;
+
             position: absolute;
             left: 20px;
             top: 90px;
@@ -239,9 +238,9 @@
             color: #fff;
             margin-bottom: 3px;
             text-transform: uppercase;
-
         }
         .planet-type {
+
             font-size: 12px;
             color: var(--neon-cyan);
             text-transform: uppercase;
@@ -259,9 +258,9 @@
         }
         .planet-stats {
             border-top: 1px solid rgba(255,255,255,0.1);
-
             padding-top: 10px;
             margin-bottom: 15px;
+
         }
         .p-stat-row {
             display: flex;
@@ -279,9 +278,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-
             background: rgba(2, 2, 8, 0.85);
             backdrop-filter: blur(8px);
+
             z-index: 100;
             display: flex;
             justify-content: center;
@@ -299,9 +298,9 @@
             width: 90%;
             max-width: 480px;
             text-align: center;
-
             position: relative;
         }
+
         .modal-content h2 {
             font-family: var(--font-display);
             font-size: 24px;
@@ -319,9 +318,9 @@
         }
         .arcade-item {
             border: 1px solid rgba(255,255,255,0.1);
-
             background: rgba(255,255,255,0.03);
             border-radius: 8px;
+
             padding: 12px;
             display: flex;
             justify-content: space-between;
@@ -339,8 +338,8 @@
         .arcade-info p {
             font-size: 12px;
             color: rgba(255,255,255,0.6);
-
         }
+
 
         /* Settings Toggle Matrix */
         .settings-list {
@@ -359,9 +358,9 @@
         #arcade-hud {
             position: absolute;
             top: 75px;
-
             left: 50%;
             transform: translateX(-50%);
+
             width: 90%;
             max-width: 600px;
             display: none;
@@ -379,9 +378,9 @@
             min-width: 100px;
         }
         .rush-metric .val {
-
             font-size: 18px;
             font-weight: 700;
+
             color: #fff;
         }
         .rush-metric .val.bonus { color: var(--neon-gold); }
@@ -399,9 +398,9 @@
         .controls-hint {
             font-size: 13px;
             color: rgba(255,255,255,0.5);
-
             display: flex;
             gap: 12px;
+
         }
         .key-cap {
             background: rgba(255,255,255,0.15);
@@ -419,9 +418,9 @@
             width: 100%;
             justify-content: space-between;
             pointer-events: none;
-
             padding: 0 5px 5px 5px;
         }
+
         .dpad-container {
             width: 110px;
             height: 110px;
@@ -439,9 +438,9 @@
             border-radius: 50%;
             position: absolute;
             top: 31px;
-
             left: 31px;
             box-shadow: 0 0 15px var(--neon-cyan);
+
             cursor: pointer;
         }
         .action-button-pane {
@@ -459,9 +458,9 @@
             color: #fff;
             font-family: var(--font-display);
             font-weight: 700;
-
             font-size: 11px;
             display: flex;
+
             justify-content: center;
             align-items: center;
             box-shadow: 0 0 10px rgba(0,243,255,0.2);
@@ -479,9 +478,9 @@
         }
         .circle-action-btn.gold:active {
             background: var(--neon-gold);
-
             color: #000;
             box-shadow: 0 0 20px var(--neon-gold);
+
         }
 
         /* Screen state responsiveness modifications */
@@ -500,8 +499,8 @@
 </head>
 <body>
 
-
     <!-- Fallback Screen for lack of WebGL -->
+
     <div id="webgl-fallback" class="hidden">
         <h1>Critical Core Alert</h1>
         <p>Your systems/browser architecture does not support WebGL 3D rendering accelerates.</p>
@@ -520,8 +519,8 @@
             </div>
             
             <div class="stats-container">
-
                 <div class="panel stat-box">
+
                     <div class="stat-label">Vault</div>
                     <div id="hud-crystal-bank" class="stat-value">0000</div>
                 </div>
@@ -540,8 +539,8 @@
         </header>
 
         <!-- Crystal Rush Game HUD -->
-
         <div id="arcade-hud" class="interactive">
+
             <div class="rush-metric">
                 <div class="val timer" id="rush-timer">75.0s</div>
             </div>
@@ -560,8 +559,8 @@
             <div class="panel planet-card interactive" id="proximity-planet-panel">
                 <h2 id="lbl-planet-name">Planet Name</h2>
                 <div id="lbl-planet-type" class="planet-type">Class-M Planet</div>
-
                 <p id="lbl-planet-desc" class="planet-desc">Detailed analytics description...</p>
+
                 <div class="planet-stats">
                     <div class="p-stat-row">
                         <span class="p-stat-lbl">Atmosphere</span>
@@ -580,8 +579,8 @@
         <!-- Footer / Mechanical Mobile Joystick Elements -->
         <footer class="hud-footer">
             <div class="panel controls-hint">
-
                 <div><span class="key-cap">W</span><span class="key-cap">A</span><span class="key-cap">S</span><span class="key-cap">D</span> Thruster Navigation</div>
+
                 <div><span class="key-cap">⛶</span> Tap Fullscreen for immersive Mobile Play</div>
             </div>
 
@@ -600,8 +599,8 @@
     </div>
 
     <!-- Modals Overlay Blocks -->
-
     <div class="modal-overlay" id="modal-pause">
+
         <div class="panel modal-content interactive">
             <h2>Systems Suspended</h2>
             <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
@@ -620,8 +619,8 @@
                     <span>Audio Oscillators</span>
                     <button class="btn btn-gold" id="toggle-audio-fx" style="padding: 5px 12px;">ENABLED</button>
                 </div>
-
                 <div class="settings-row">
+
                     <span>Hyperdrive Density</span>
                     <button class="btn" id="toggle-graphics-perf" style="padding: 5px 12px;">HIGH DETAILED</button>
                 </div>
@@ -640,8 +639,8 @@
                         <h3>Crystal Rush 3D</h3>
                         <p>High speed asteroid-lane navigation crystal aggregator.</p>
                         <p style="font-size: 11px; color: var(--neon-gold); margin-top: 4px;">Record: <span id="lbl-high-score">0000</span> pts</p>
-
                     </div>
+
                     <button class="btn btn-gold" id="btn-launch-crystalrush">Launch</button>
                 </div>
             </div>
@@ -660,8 +659,8 @@
                 if (!this.enabled) return;
                 this.init();
                 try {
-
                     const osc = this.ctx.createOscillator();
+
                     const gain = this.ctx.createGain();
                     osc.connect(gain); gain.connect(this.ctx.destination);
                     const now = this.ctx.currentTime;
@@ -680,8 +679,8 @@
                         osc.frequency.exponentialRampToValueAtTime(700, now + 0.35);
                         gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
                         osc.start(now); osc.stop(now + 0.4);
-
                     } else if (type === 'click') {
+
                         osc.type = 'sine'; osc.frequency.setValueAtTime(900, now);
                         gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
                         osc.start(now); osc.stop(now + 0.04);
@@ -700,8 +699,8 @@
                 id: 4,
                 name: "Twitch Glitch Nexus",
                 type: "3D Interland Platform Matrix",
-
                 desc: "A stylized geometric network built entirely from vibrant low-poly purple floating voxel prisms, glowing stream conduits, and neon sub-islands.",
+
                 atmosphere: "Hypermedia Streaming Grid",
                 hazard: "Anomalous Glitch De-synchronization",
                 color: 0x9146ff,
@@ -720,8 +719,8 @@
                 this.highScore = parseInt(localStorage.getItem('ge_highscore')) || 0;
                 document.getElementById('hud-crystal-bank').innerText = String(this.crystalBank).padStart(4, '0');
                 document.getElementById('lbl-high-score').innerText = String(this.highScore).padStart(4, '0');
-
             },
+
             addCrystals(qty) {
                 this.crystalBank += qty; localStorage.setItem('ge_crystals', this.crystalBank);
                 document.getElementById('hud-crystal-bank').innerText = String(this.crystalBank).padStart(4, '0');
@@ -740,8 +739,8 @@
         
         const player = { mesh: null, pos: { x: 0, z: 0 }, speed: 0.52, rotation: 0, targetRotation: 0 };
         const keys = { w:0, a:0, s:0, d:0, ArrowUp:0, ArrowLeft:0, ArrowDown:0, ArrowRight:0 };
-
         
+
         let joystickActive = false;
         let joystickStart = { x: 0, y: 0 };
         let joystickCurrent = { x: 0, y: 0 };
@@ -760,8 +759,8 @@
                 document.getElementById('rush-score').innerText = "0000";
                 document.getElementById('rush-timer').innerText = "75.0s";
                 document.getElementById('rush-boost').innerText = "READY";
-
                 document.getElementById('rush-boost').className = "val bonus";
+
                 buildArcadeScene();
             },
             terminate(completed = true) {
@@ -780,8 +779,8 @@
         };
 
         function initGraphicsEngine() {
-
             const container = document.getElementById('canvas-container');
+
             try {
                 scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x020208, 0.009);
                 camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -800,8 +799,8 @@
             return true;
         }
 
-
         function clearThreeScene() {
+
             while(scene.children.length > 0){ scene.remove(scene.children[0]); }
             planetMeshes = []; portalRings = []; CrystalRush.entities = [];
         }
@@ -1123,11 +1122,32 @@
         function registerControlHandlers() {
             window.addEventListener('keydown', (e) => {
                 if(e.key === 'Escape' || e.key === 'Esc') { toggleModal('modal-pause'); return; }
-                const lower = e.key.toLowerCase(); if(lower in keys) keys[lower] = 1; if(e.key in keys) keys[e.key] = 1;
+                
 
+                // Intercept and halt keyboard scrolling rules instantly
+                if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Spacebar'].includes(e.key)) {
+                    e.preventDefault();
+                }
+
+                if(e.key in keys) keys[e.key] = 1;
+                const lower = e.key.toLowerCase();
+                if(lower in keys) keys[lower] = 1;
+
+                if(e.key === ' ' || e.code === 'Space') {
+                    if(GameState.current === 'CRYSTAL_RUSH') {
+                        CrystalRush.triggerBoost();
+                    }
+                }
             });
+
             window.addEventListener('keyup', (e) => {
-                const lower = e.key.toLowerCase(); if(lower in keys) keys[lower] = 0; if(e.key in keys) keys[e.key] = 0;
+                if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Spacebar'].includes(e.key)) {
+                    e.preventDefault();
+
+                }
+                if(e.key in keys) keys[e.key] = 0;
+                const lower = e.key.toLowerCase();
+                if(lower in keys) keys[lower] = 0;
             });
 
             const bound = document.getElementById('virtual-joystick-bound');
@@ -1143,8 +1163,8 @@
                 if(!joystickActive) return; e.preventDefault();
                 const t = e.touches[0]; joystickCurrent = { x: t.clientX, y: t.clientY };
                 let dx = joystickCurrent.x - joystickStart.x; let dy = joystickCurrent.y - joystickStart.y;
-                const dist = Math.sqrt(dx*dx + dy*dy);
 
+                const dist = Math.sqrt(dx*dx + dy*dy);
                 if(dist > joystickMaxDrag) { dx = (dx / dist) * joystickMaxDrag; dy = (dy / dist) * joystickMaxDrag; }
                 handle.style.transform = `translate(${dx}px, ${dy}px)`;
             };
@@ -1163,8 +1183,8 @@
             });
             document.getElementById('mobile-action-boost').addEventListener('click', () => {
                 if(GameState.current === 'CRYSTAL_RUSH') CrystalRush.triggerBoost();
-            });
 
+            });
 
             document.getElementById('btn-fullscreen-hud').addEventListener('click', triggerRequestFullscreen);
             document.getElementById('btn-modal-fullscreen').addEventListener('click', triggerRequestFullscreen);
@@ -1183,9 +1203,9 @@
             });
             document.getElementById('toggle-graphics-perf').addEventListener('click', function() {
                 GameState.graphicsHigh = !GameState.graphicsHigh; this.innerText = GameState.graphicsHigh ? "HIGH DETAILED" : "ENERGY SAVING";
+
                 AudioFX.play('click');
                 if(GameState.current === 'HUB') buildHubScene(); else if(GameState.current === 'CRYSTAL_RUSH') buildArcadeScene();
-
             });
         }
 
@@ -1204,8 +1224,8 @@
             }
         }
 
-        window.onload = function() {
 
+        window.onload = function() {
             GameState.initStorage();
             if (initGraphicsEngine()) { buildHubScene(); registerControlHandlers(); executeFramePulse(); }
         };
