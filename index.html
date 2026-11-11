@@ -1,173 +1,26 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Galaxy Explorer — Mini Games</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>Galaxy Explorer — Galaxy Map</title>
 <style>
-:root{--cyan:#78edff;--gold:#ffd16e;--panel:rgba(5,15,37,.78)}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020612;color:#effaff;font-family:Inter,system-ui,Arial;touch-action:none}
-#stage{position:fixed;inset:0}canvas{display:block}
-#ui{position:fixed;inset:0;pointer-events:none}
-.glass{background:linear-gradient(145deg,rgba(7,21,48,.82),rgba(3,9,25,.7));border:1px solid #79eaff55;box-shadow:0 12px 36px #0008,inset 0 1px #fff1;backdrop-filter:blur(13px);border-radius:17px}
-header{position:absolute;top:14px;left:16px;right:16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.logo{font-weight:1000;letter-spacing:.18em;font-size:12px;color:#e8fbff;text-shadow:0 0 18px #43dfff}
-.logo span{color:var(--gold)}
-.stats{display:flex;gap:8px}.stat{padding:9px 13px;font-size:10px;letter-spacing:.1em;color:#a9c6e4}.stat b{color:var(--gold);font-size:14px;margin-left:6px}
-#home,#raceHud{position:absolute;inset:0;pointer-events:none}
-#homePanel{position:absolute;left:clamp(18px,8vw,120px);top:50%;transform:translateY(-48%);width:min(520px,84vw);padding:clamp(20px,4vw,38px);pointer-events:auto}
-.eyebrow{color:var(--cyan);font-size:10px;letter-spacing:.27em;font-weight:950}
-h1{font-size:clamp(46px,8vw,82px);line-height:.86;letter-spacing:-.075em;margin:16px 0;background:linear-gradient(100deg,#fff,#6eeaff 55%,#ffd078);color:transparent;background-clip:text}
-.lead{font-size:13px;color:#b8cce5;line-height:1.7;max-width:430px}
-.gameCard{margin-top:23px;padding:15px;border-radius:15px;border:1px solid #67e6ff55;background:linear-gradient(110deg,#10345aab,#111d43b8);display:flex;align-items:center;gap:14px}
-.gameIcon{width:68px;height:68px;flex:none;border-radius:14px;background:radial-gradient(circle at 35% 25%,#e7ffff,#53dfff 25%,#174d9b 57%,#07132d 78%);box-shadow:0 0 24px #3acfff55;position:relative}
-.gameIcon:before{content:"";position:absolute;width:30px;height:48px;left:19px;top:10px;background:linear-gradient(90deg,#d9faff,#4788c9,#e6ffff);clip-path:polygon(50% 0,100% 83%,50% 68%,0 83%)}
-.gameInfo{flex:1;min-width:0}.gameInfo strong{font-size:15px;display:block}.gameInfo small{color:#a8c1dc;font-size:10px;line-height:1.5}
-button{font:850 11px inherit;letter-spacing:.08em;color:#effcff;border:1px solid #83edff99;background:linear-gradient(105deg,#087da7,#3158b4);padding:14px 20px;border-radius:12px;cursor:pointer;box-shadow:0 0 24px #1bbce944,inset 0 1px #fff3;transition:.15s}
-button:active{transform:scale(.96);filter:brightness(1.2)}
-#play{width:100%;margin-top:15px;font-size:13px;padding:16px}
-.hint{font-size:10px;color:#88a8c8;line-height:1.7;margin-top:16px}
-#raceHud{display:none}
-#mission{position:absolute;top:72px;left:16px;padding:12px 15px;width:min(260px,55vw)}
-.smallLabel{font-size:9px;letter-spacing:.2em;color:var(--cyan);font-weight:950;margin-bottom:6px}
-#missionText{font-size:11px;line-height:1.5;color:#dcefff}
-#scorePanel{position:absolute;top:72px;right:16px;padding:12px 16px;text-align:right;min-width:120px}
-#score{font-size:27px;font-weight:950;color:#fff;text-shadow:0 0 17px #39dfff}
-#scorePanel small{font-size:9px;letter-spacing:.16em;color:#9ab6d5}
-#speedline{position:absolute;left:50%;top:15%;transform:translateX(-50%);font-size:10px;letter-spacing:.28em;color:#b9f7ff;text-shadow:0 0 14px #38cfff;opacity:.75}
-#notice{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:1000;font-size:clamp(18px,4vw,34px);letter-spacing:.08em;color:#fff;text-shadow:0 0 24px #ffb34d;opacity:0;transition:opacity .2s;white-space:nowrap}
-#notice.on{opacity:1}
-#touch{position:absolute;left:16px;right:16px;bottom:max(16px,env(safe-area-inset-bottom));display:none;justify-content:space-between;align-items:flex-end;pointer-events:none}
-.touchGroup{display:flex;gap:9px;pointer-events:auto}
-.touchBtn{width:64px;height:64px;border-radius:18px;padding:0;font-size:23px;background:linear-gradient(145deg,#174c73ed,#111d42ed);touch-action:none}
-#boostBtn{font-size:10px;width:74px;height:54px;border-color:#ffd16e88;background:linear-gradient(145deg,#81542b,#4b2b3a)}
-#pauseBtn{position:absolute;right:16px;bottom:16px;pointer-events:auto;padding:10px 14px;background:#102644cc;font-size:9px}
-#pauseStrip{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:none;pointer-events:auto;padding:18px 22px;text-align:center}
-#pauseStrip strong{display:block;font-size:20px;margin-bottom:12px}
-#pauseStrip button{margin:4px}
-#finishStrip{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:none;pointer-events:auto;padding:22px;text-align:center;width:min(360px,90vw)}
-#finishStrip strong{display:block;font-size:27px;margin-bottom:7px}
-#finishStrip p{color:#b7cce3;font-size:12px}
-#finishStrip button{margin:4px}
-@media(max-width:700px){
- header{top:8px;left:9px;right:9px}.logo{font-size:9px;letter-spacing:.12em}.stat{padding:7px 8px;font-size:8px}.stat b{font-size:11px}
- #homePanel{left:5vw;top:50%;width:90vw;padding:22px;transform:translateY(-50%)}h1{font-size:clamp(48px,13vw,70px)}
- .lead{font-size:11px}.gameCard{padding:11px;margin-top:17px}.gameIcon{width:54px;height:54px}.gameInfo strong{font-size:13px}
- #mission{top:52px;left:8px;padding:9px;width:52vw;border-radius:12px}#scorePanel{top:52px;right:8px;padding:8px 10px;min-width:90px;border-radius:12px}#score{font-size:21px}
- #speedline{top:22%;font-size:8px}#touch{display:flex}.touchBtn{width:58px;height:58px}#pauseBtn{right:8px;bottom:88px}
- #notice{top:42%}
-}
-@media(hover:none) and (pointer:coarse){#touch{display:flex}}
-</style>
-</head>
-<body>
-<div id="stage"></div>
-<div id="ui">
-<header><div class="logo">GALAXY <span>EXPLORER</span></div><div class="stats"><div class="glass stat">BEST <b id="best">0</b></div><div class="glass stat">CRYSTALS <b id="bank">0</b></div></div></header>
-<section id="home">
- <div id="homePanel" class="glass">
-  <div class="eyebrow">THE ARCADE IS OPEN</div>
-  <h1>GALAXY<br>EXPLORER</h1>
-  <p class="lead">A universe of mini-games. Race through vivid alien sectors, dodge dangerous space debris and grab glowing crystals. More challenges will join the arcade.</p>
-  <div class="gameCard"><div class="gameIcon"></div><div class="gameInfo"><strong>01 / CRYSTAL RUSH</strong><small>HIGH-SPEED SPACE RACE<br>Collect crystals · Dodge asteroids · Beat your best score</small></div></div>
-  <button id="play">PLAY CRYSTAL RUSH　→</button>
-  <div class="hint">DESKTOP: A / D or ← / → to change lanes · SPACE to boost<br>MOBILE: use the left and right controls · Hold BOOST for extra speed</div>
- </div>
-</section>
-<section id="raceHud">
- <div id="mission" class="glass"><div class="smallLabel">CRYSTAL RUSH · SECTOR 01</div><div id="missionText">Stay sharp. Collect crystals and avoid the debris.</div></div>
- <div id="scorePanel" class="glass"><small>RACE SCORE</small><div id="score">0</div><small id="combo">CRYSTALS 0</small></div>
- <div id="speedline">WARP SPEED　/　ORION NEBULA</div><div id="notice"></div>
- <div id="touch"><div class="touchGroup"><button class="touchBtn" id="leftBtn">◀</button><button class="touchBtn" id="rightBtn">▶</button></div><div class="touchGroup"><button id="boostBtn">BOOST</button></div></div>
- <button id="pauseBtn">Ⅱ　PAUSE</button>
- <div id="pauseStrip" class="glass"><strong>RACE PAUSED</strong><button id="resume">RESUME</button><button id="quit">ARCADE</button></div>
- <div id="finishStrip" class="glass"><strong>RACE COMPLETE</strong><div id="finalScore">0</div><p id="finishText"></p><button id="again">RACE AGAIN</button><button id="homeBtn">ARCADE</button></div>
-</section>
+:root{--cyan:#75edff;--gold:#ffd16e}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020611;color:#effaff;font-family:Inter,system-ui,Arial;touch-action:none}#stage{position:fixed;inset:0}canvas{display:block}#ui{position:fixed;inset:0;pointer-events:none}.glass{background:linear-gradient(145deg,#071831d9,#050c20cf);border:1px solid #79eaff55;box-shadow:0 12px 36px #0008,inset 0 1px #fff1;backdrop-filter:blur(13px);border-radius:17px}header{position:absolute;top:15px;left:18px;right:18px;display:flex;align-items:center;justify-content:space-between;gap:10px}.logo{font-size:12px;font-weight:1000;letter-spacing:.18em;text-shadow:0 0 18px #43dfff}.logo span{color:var(--gold)}.topRight{display:flex;gap:8px;align-items:center}.pill{padding:10px 13px;font-size:10px;color:#a9c6e4;letter-spacing:.1em}.pill b{color:var(--gold);font-size:14px;margin-left:6px}#intro{position:absolute;left:clamp(16px,5vw,70px);top:95px;width:min(390px,75vw);padding:22px;pointer-events:auto} .eyebrow{color:var(--cyan);font-size:9px;letter-spacing:.25em;font-weight:950}h1{font-size:clamp(32px,5vw,55px);line-height:.9;letter-spacing:-.06em;margin:12px 0;background:linear-gradient(100deg,#fff,#71eaff 60%,#ffd078);color:transparent;background-clip:text}.desc{font-size:12px;color:#b6cce4;line-height:1.65;margin:0}.instructions{font-size:10px;color:#8eafd0;margin-top:14px;line-height:1.7}#nearby{position:absolute;left:50%;bottom:25px;transform:translateX(-50%);width:min(430px,90vw);padding:15px 18px;text-align:center;display:none;pointer-events:auto}#nearTitle{font-size:18px;font-weight:950;letter-spacing:.04em}#nearDesc{font-size:10px;color:#aac4df;margin:5px 0 12px}button{font:900 11px inherit;letter-spacing:.1em;color:#f0fcff;border:1px solid #83edff99;background:linear-gradient(105deg,#087da7,#3158b4);padding:13px 20px;border-radius:11px;cursor:pointer}button:active{transform:scale(.97)}#enter{width:100%;font-size:12px;padding:15px}#toast{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:15px 22px;display:none;text-align:center;font-size:12px;font-weight:900;letter-spacing:.08em}#touch{position:absolute;left:14px;bottom:18px;display:none;gap:8px;pointer-events:auto}.pad{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(2,45px);gap:4px}.pad button{padding:0;font-size:17px;background:#102c4ce8}.pad button:nth-child(1){grid-column:2}.pad button:nth-child(2){grid-column:1;grid-row:2}.pad button:nth-child(3){grid-column:2;grid-row:2}.pad button:nth-child(4){grid-column:3;grid-row:2}#mapHint{position:absolute;right:18px;bottom:22px;padding:12px 15px;font-size:9px;letter-spacing:.12em;color:#a9c8e6}@media(max-width:700px){header{top:9px;left:10px;right:10px}.logo{font-size:9px}.pill{padding:7px 8px;font-size:8px}#intro{top:64px;left:10px;width:min(300px,72vw);padding:15px}h1{font-size:36px}.desc{font-size:10px}.instructions{font-size:9px;margin-top:8px}#touch{display:block}#mapHint{right:10px;bottom:17px;font-size:8px;max-width:125px;text-align:right}#nearby{bottom:95px}}@media(hover:none) and (pointer:coarse){#touch{display:block}}
+</style></head><body><div id="stage"></div><div id="ui">
+<header><div class="logo">GALAXY <span>EXPLORER</span></div><div class="topRight"><div class="glass pill">CRYSTALS <b id="bank">0</b></div><div class="glass pill">GALAXIES <b>6</b></div></div></header>
+<section id="intro" class="glass"><div class="eyebrow">THE GALACTIC PLAYGROUND</div><h1>CHOOSE YOUR<br>GALAXY</h1><p class="desc">Explore the star map like an intergalactic adventurer. Walk around the hub, discover glowing portals and choose which galaxy to visit.</p><div class="instructions">WASD / ARROW KEYS TO WALK<br>WALK UP TO A PORTAL TO EXPLORE IT</div></section>
+<div id="nearby" class="glass"><div class="eyebrow">GALAXY DISCOVERED</div><div id="nearTitle">ORION NEBULA</div><div id="nearDesc">Enter this galaxy to play its mini-game.</div><button id="enter">ENTER GALAXY →</button></div>
+<div id="toast" class="glass">COMING SOON</div>
+<div id="touch"><div class="pad"><button data-move="forward">▲</button><button data-move="left">◀</button><button data-move="back">▼</button><button data-move="right">▶</button></div></div>
+<div id="mapHint" class="glass">EXPLORE THE HUB<br>FIND A PORTAL</div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
-(()=>{'use strict';
-const $=id=>document.getElementById(id);
-if(!window.THREE){$('homePanel').insertAdjacentHTML('beforeend','<p>3D engine could not load. Please check your connection.</p>');return}
-let scene,camera,renderer,clock=new THREE.Clock(),ship,shipGroup,track,stars,planet,ring;
-let decor=[],traffic=[],crystals=[],lane=1,targetLane=1,score=0,crystalCount=0,best=Number(localStorage.getItem('gxRaceBest')||0),bank=Number(localStorage.getItem('gxCrystalBank')||0);
-let running=false,paused=false,finished=false,boost=false,speed=52,elapsed=0,spawnTimer=0,hitCooldown=0,noticeTimer=0;
-const lanes=[-6,0,6],mat=(color,em=0,metal=.25)=>new THREE.MeshStandardMaterial({color,roughness:.38,metalness:metal,emissive:color,emissiveIntensity:em});
-$('best').textContent=best;$('bank').textContent=bank;
-function init(){
- scene=new THREE.Scene();scene.background=new THREE.Color(0x030716);scene.fog=new THREE.FogExp2(0x030716,.0024);
- camera=new THREE.PerspectiveCamera(67,innerWidth/innerHeight,.1,1800);camera.position.set(0,8,19);
- renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;$('stage').appendChild(renderer.domElement);
- scene.add(new THREE.HemisphereLight(0x9adfff,0x17102f,1.6));let sun=new THREE.DirectionalLight(0xffffff,2.4);sun.position.set(-25,50,30);scene.add(sun);
- const starGeo=new THREE.BufferGeometry(),pos=[];for(let i=0;i<6500;i++)pos.push((Math.random()-.5)*1500,(Math.random()-.5)*900,(Math.random()-.5)*1700);starGeo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));stars=new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xc6edff,size:1.25}));scene.add(stars);
- // Large detailed planet and rings make the menu and every game screen a live 3D scene.
- planet=new THREE.Group();let p=new THREE.Mesh(new THREE.SphereGeometry(62,64,48),new THREE.MeshStandardMaterial({color:0x573a9d,roughness:.92,metalness:.08}));planet.add(p);
- let cloud=new THREE.Mesh(new THREE.SphereGeometry(63.3,48,32),new THREE.MeshBasicMaterial({color:0x8b6be1,transparent:true,opacity:.11,side:THREE.BackSide}));planet.add(cloud);
- ring=new THREE.Mesh(new THREE.TorusGeometry(88,5,3,120),new THREE.MeshStandardMaterial({color:0x5bcce9,emissive:0x155b91,emissiveIntensity:.45,metalness:.6,roughness:.4}));ring.rotation.x=1.23;planet.add(ring);planet.position.set(100,35,-280);scene.add(planet);
- buildTrack();buildShip();window.addEventListener('resize',resize);
-}
-function buildTrack(){
- track=new THREE.Group();scene.add(track);
- const road=new THREE.Mesh(new THREE.PlaneGeometry(24,1200),new THREE.MeshStandardMaterial({color:0x07162e,metalness:.55,roughness:.65,side:THREE.DoubleSide}));road.rotation.x=-Math.PI/2;road.position.set(0,-5,-450);track.add(road);
- for(let x of [-12,12]){let rail=new THREE.Mesh(new THREE.BoxGeometry(.35,.35,1200),mat(0x32cfff,1.7));rail.position.set(x,-4.65,-450);track.add(rail)}
- for(let x of [-4,4]){let line=new THREE.Mesh(new THREE.BoxGeometry(.09,.035,1200),new THREE.MeshBasicMaterial({color:0x1e75ad,transparent:true,opacity:.7}));line.position.set(x,-4.79,-450);track.add(line)}
- for(let i=0;i<42;i++){let bar=new THREE.Mesh(new THREE.BoxGeometry(24,.08,1.1),new THREE.MeshBasicMaterial({color:0x164b79,transparent:true,opacity:.7}));bar.position.set(0,-4.76,-i*28);track.add(bar)}
- for(let i=0;i<32;i++){let a=new THREE.Group(),pillar=new THREE.Mesh(new THREE.BoxGeometry(.7,13,.7),mat(i%2?0x2879a8:0x603b9d,.6));a.add(pillar);let lamp=new THREE.Mesh(new THREE.SphereGeometry(.9,12,8),mat(0x67eaff,2));lamp.position.y=6.7;a.add(lamp);a.position.set(i%2?18:-18,0,-i*39-20);track.add(a);decor.push(a)}
-}
-function buildShip(){
- shipGroup=new THREE.Group();ship=new THREE.Group();shipGroup.add(ship);scene.add(shipGroup);
- let body=new THREE.Mesh(new THREE.ConeGeometry(1.05,4.3,8),mat(0xc4e8fa,.3,.65));body.rotation.x=Math.PI/2;ship.add(body);
- let canopy=new THREE.Mesh(new THREE.SphereGeometry(.55,20,14),new THREE.MeshStandardMaterial({color:0x44dcff,emissive:0x087aa9,emissiveIntensity:1.3,metalness:.55,roughness:.12}));canopy.scale.set(.8,.65,1.25);canopy.position.set(0,.28,-.45);ship.add(canopy);
- for(let side of [-1,1]){let wing=new THREE.Mesh(new THREE.BoxGeometry(2.8,.14,1.35),mat(0x245b89,.5,.6));wing.position.set(side*1.35,0,.45);wing.rotation.z=-side*.13;ship.add(wing);let flame=new THREE.Mesh(new THREE.CylinderGeometry(.2,.34,1.8,16),new THREE.MeshBasicMaterial({color:0x49dfff}));flame.rotation.x=Math.PI/2;flame.position.set(side*.68,0,2.4);ship.add(flame)}
- shipGroup.position.set(0,-1.5,5);
-}
+(()=>{'use strict';const $=id=>document.getElementById(id);if(!window.THREE){$('intro').insertAdjacentHTML('beforeend','<p>3D engine could not load. Check your connection.</p>');return}
+let scene,camera,renderer,clock=new THREE.Clock(),player,world,active=-1,near=-1,toastTime=0;const keys={},touch={forward:false,back:false,left:false,right:false};const galaxies=[{name:'ORION NEBULA',sub:'Crystal Rush · High-speed space race',color:0x34dfff,file:'crystal-rush.html',open:true},{name:'VERDANT PRIME',sub:'A mysterious green world · Mini-game coming soon',color:0x69f58b},{name:'EMBERFALL',sub:'A volcanic galaxy · Mini-game coming soon',color:0xff805b},{name:'AZURE DRIFT',sub:'An ocean of stars · Mini-game coming soon',color:0x548bff},{name:'NEBULA VEIL',sub:'A purple cosmic maze · Mini-game coming soon',color:0xc17aff},{name:'THE SILENT MOON',sub:'A hidden lunar world · Mini-game coming soon',color:0xcbd5e8}];const nodes=[];
+function mat(c,e=0){return new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:e,roughness:.55,metalness:.25})}
+function labelSprite(text,color){let c=document.createElement('canvas');c.width=512;c.height=128;let x=c.getContext('2d');x.fillStyle='#07152be8';x.strokeStyle='#8ceeff';x.lineWidth=4;x.beginPath();x.roundRect(5,5,502,118,24);x.fill();x.stroke();x.font='900  thirtypx Arial';x.font='900  thirtypx Arial';x.font='900 34px Arial';x.textAlign='center';x.fillStyle='#ffffff';x.fillText(text,256,78);let t=new THREE.CanvasTexture(c);let s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true}));s.scale.set(10,2.5,1);return s}
+function makePlanet(d,i){let angle=i*Math.PI/3-Math.PI/2,x=Math.cos(angle)*27,z=Math.sin(angle)*27;let group=new THREE.Group();group.position.set(x,0,z);scene.add(group);let island=new THREE.Mesh(new THREE.CylinderGeometry(6.4,7.5,2.3,9),new THREE.MeshStandardMaterial({color:0x101d3c,metalness:.65,roughness:.35}));island.position.y=-.8;group.add(island);let rim=new THREE.Mesh(new THREE.TorusGeometry(6.1,.18,8,64),new THREE.MeshBasicMaterial({color:d.color}));rim.rotation.x=Math.PI/2;rim.position.y=.38;group.add(rim);let orb=new THREE.Mesh(new THREE.SphereGeometry(3.3,32,24),new THREE.MeshStandardMaterial({color:d.color,emissive:d.color,emissiveIntensity:.32,roughness:.25,metalness:.35}));orb.position.y=4.3;group.add(orb);let halo=new THREE.Mesh(new THREE.TorusGeometry(4.8,.12,8,64),new THREE.MeshBasicMaterial({color:d.color}));halo.rotation.x=1.15;halo.position.y=4.2;group.add(halo);let portal=new THREE.Mesh(new THREE.TorusGeometry(2.6,.22,12,48),new THREE.MeshBasicMaterial({color:d.color}));portal.position.y=1.4;portal.rotation.x=Math.PI/2;group.add(portal);let sprite=labelSprite(d.name,d.color);sprite.position.y=8.6;group.add(sprite);for(let k=0;k<4;k++){let crystal=new THREE.Mesh(new THREE.OctahedronGeometry(.65,0),new THREE.MeshBasicMaterial({color:d.color}));crystal.position.set(Math.cos(k*Math.PI/2)*4.7,1.5,Math.sin(k*Math.PI/2)*4.7);group.add(crystal)}nodes.push({group,x,z,data:d,orb,portal});}
+function init(){scene=new THREE.Scene();scene.background=new THREE.Color(0x030716);scene.fog=new THREE.FogExp2(0x030716,.008);camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,500);renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setSize(innerWidth,innerHeight);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.2;$('stage').appendChild(renderer.domElement);scene.add(new THREE.HemisphereLight(0x9bdfff,0x21113e,1.7));let sun=new THREE.PointLight(0x55cfff,180,130);sun.position.set(0,25,0);scene.add(sun);let floor=new THREE.Mesh(new THREE.CylinderGeometry(48,52,3,64),new THREE.MeshStandardMaterial({color:0x09172e,metalness:.55,roughness:.7}));floor.position.y=-2;scene.add(floor);let ring=new THREE.Mesh(new THREE.TorusGeometry(48,.3,8,180),new THREE.MeshBasicMaterial({color:0x2388ba}));ring.rotation.x=Math.PI/2;ring.position.y=-.4;scene.add(ring);for(let i=0;i<6;i++)makePlanet(galaxies[i],i);for(let i=0;i<6;i++){let a=i*Math.PI/3-Math.PI/2;let path=new THREE.Mesh(new THREE.BoxGeometry(2,.2,22),mat(0x17466a,.3));path.position.set(Math.cos(a)*13,-.25,Math.sin(a)*13);path.rotation.y=-a;scene.add(path)}let starGeo=new THREE.BufferGeometry(),p=[];for(let i=0;i<3000;i++)p.push((Math.random()-.5)*500,Math.random()*240-40,(Math.random()-.5)*500);starGeo.setAttribute('position',new THREE.Float32BufferAttribute(p,3));scene.add(new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xc5eaff,size:1.15})));let core=new THREE.Mesh(new THREE.IcosahedronGeometry(5,2),new THREE.MeshStandardMaterial({color:0xffc76a,emissive:0xff8a25,emissiveIntensity:1.4,metalness:.4,roughness:.3}));core.position.y=2;scene.add(core);let coreRing=new THREE.Mesh(new THREE.TorusGeometry(8,.16,8,90),new THREE.MeshBasicMaterial({color:0xffc76a}));coreRing.rotation.x=1.1;coreRing.position.y=2;scene.add(coreRing);player=new THREE.Group();let suit=new THREE.Mesh(new THREE.CapsuleGeometry(.65,1.1,5,10),mat(0xeaf8ff,.1));suit.position.y=1.1;player.add(suit);let visor=new THREE.Mesh(new THREE.SphereGeometry(.48,18,14),new THREE.MeshStandardMaterial({color:0x39dfff,emissive:0x087ba9,emissiveIntensity:1.2,metalness:.6,roughness:.15}));visor.position.set(0,2,.28);visor.scale.set(1,.78,.65);player.add(visor);let pack=new THREE.Mesh(new THREE.BoxGeometry(.75,.9,.35),mat(0x3566a5,.5));pack.position.set(0,1.15,-.55);player.add(pack);player.position.set(0,0,0);scene.add(player);camera.position.set(0,13,19);camera.lookAt(0,1,0);window.addEventListener('resize',resize)}
 function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}
-function addTraffic(type,laneIndex,z){
- let g=new THREE.Group(),x=lanes[laneIndex];
- if(type==='rock'){let mesh=new THREE.Mesh(new THREE.IcosahedronGeometry(2.2,1),mat(0x796b91,.15,.35));mesh.scale.set(1.1,.9,1.2);g.add(mesh);for(let i=0;i<3;i++){let shard=new THREE.Mesh(new THREE.DodecahedronGeometry(.55,0),mat(0x9b8baa));shard.position.set((Math.random()-.5)*2.8,(Math.random()-.5)*2.5,(Math.random()-.5)*2.5);g.add(shard)}g.userData={kind:'rock',radius:2.5}}
- else{let crystal=new THREE.Mesh(new THREE.OctahedronGeometry(1.55,0),new THREE.MeshStandardMaterial({color:0x72faff,emissive:0x1ac7ee,emissiveIntensity:2,metalness:.5,roughness:.15}));g.add(crystal);let halo=new THREE.Mesh(new THREE.TorusGeometry(2.2,.07,8,32),new THREE.MeshBasicMaterial({color:0xb5ffff}));g.add(halo);g.userData={kind:'crystal',radius:2.1}}
- g.position.set(x,-1.2,z);g.userData.baseX=x;scene.add(g);traffic.push(g);
-}
-function resetRace(){
- traffic.forEach(o=>scene.remove(o));traffic=[];lane=1;targetLane=1;shipGroup.position.set(0,-1.5,5);score=0;crystalCount=0;elapsed=0;spawnTimer=.5;hitCooldown=0;speed=52;boost=false;finished=false;paused=false;
- $('score').textContent='0';$('combo').textContent='CRYSTALS 0';$('notice').classList.remove('on');$('pauseStrip').style.display='none';$('finishStrip').style.display='none';
-}
-function startRace(){resetRace();running=true;$('home').style.display='none';$('raceHud').style.display='block';clock.getDelta()}
-function changeLane(n){if(!running||paused||finished)return;targetLane=Math.max(0,Math.min(2,targetLane+n));}
-function showNotice(text){$('notice').textContent=text;$('notice').classList.add('on');noticeTimer=.85}
-function collide(o){if(o.userData.kind==='crystal'){score+=100;crystalCount++;bank++;localStorage.setItem('gxCrystalBank',bank);$('bank').textContent=bank;$('combo').textContent='CRYSTALS '+crystalCount;showNotice('+100 CRYSTAL');}
- else{score=Math.max(0,score-75);showNotice('CRASH!  −75 POINTS');hitCooldown=.55;shipGroup.position.x+=(shipGroup.position.x<o.position.x?-1:1)*.65;}
- $('score').textContent=score;scene.remove(o);traffic=traffic.filter(x=>x!==o);
-}
-function finish(){finished=true;running=false;best=Math.max(best,score);localStorage.setItem('gxRaceBest',best);$('best').textContent=best;$('finalScore').textContent=score.toLocaleString()+' POINTS';$('finishText').textContent='You collected '+crystalCount+' crystals. Your best score is '+best.toLocaleString()+'.';$('finishStrip').style.display='block'}
-function tick(dt){
- elapsed+=dt;let boostFactor=boost?1.45:1;speed=52*boostFactor+Math.min(elapsed*.6,22);
- // The track and starfield stream backwards to create a fast forward race.
- track.position.z=(track.position.z+speed*dt)%28;stars.position.z+=speed*dt*.22;if(stars.position.z>100)stars.position.z=0;
- planet.rotation.y+=dt*.035;planet.rotation.z+=dt*.009;
- shipGroup.position.x=THREE.MathUtils.damp(shipGroup.position.x,lanes[targetLane],dt*9);ship.rotation.z=THREE.MathUtils.damp(ship.rotation.z,(lanes[targetLane]-shipGroup.position.x)*-.045,dt*7);
- camera.position.x=THREE.MathUtils.damp(camera.position.x,shipGroup.position.x*.28,dt*2);camera.lookAt(shipGroup.position.x*.25,-1,-22);
- decor.forEach(d=>{d.position.z+=speed*dt;if(d.position.z>25)d.position.z-=32*39});
- spawnTimer-=dt;if(spawnTimer<=0){let laneA=Math.floor(Math.random()*3);addTraffic(Math.random()<.62?'rock':'crystal',laneA,-170);if(Math.random()<.24){let laneB=(laneA+1+Math.floor(Math.random()*2))%3;addTraffic('crystal',laneB,-210)}spawnTimer=Math.max(.42,1.08-elapsed*.004)*(boost?1.05:1)}
- for(let o of [...traffic]){o.position.z+=speed*dt;o.rotation.y+=dt*(o.userData.kind==='crystal'?1.9:.55);o.rotation.x+=dt*.35;if(o.position.z>14){scene.remove(o);traffic=traffic.filter(x=>x!==o);continue}if(o.position.distanceTo(shipGroup.position)<(o.userData.radius+1.15)&&hitCooldown<=0){collide(o)}}
- if(hitCooldown>0)hitCooldown-=dt;if(noticeTimer>0){noticeTimer-=dt;if(noticeTimer<=0)$('notice').classList.remove('on')}
- score+=Math.floor(dt*(boost?18:10));$('score').textContent=score.toLocaleString();
- $('speedline').textContent=(boost?'BOOST ENGAGED':'WARP SPEED')+'　/　'+Math.round(speed*3.6)+' KM/H';
- if(elapsed>=75)finish();
-}
-function loop(){requestAnimationFrame(loop);let dt=Math.min(clock.getDelta(),.05);if(running&&!paused&&!finished)tick(dt);renderer.render(scene,camera)}
-$('play').onclick=startRace;$('leftBtn').addEventListener('pointerdown',e=>{e.preventDefault();changeLane(-1)});$('rightBtn').addEventListener('pointerdown',e=>{e.preventDefault();changeLane(1)});
-$('boostBtn').addEventListener('pointerdown',e=>{e.preventDefault();boost=true});['pointerup','pointerleave','pointercancel'].forEach(ev=>$('boostBtn').addEventListener(ev,()=>boost=false));
-$('pauseBtn').onclick=()=>{if(!running||finished)return;paused=true;$('pauseStrip').style.display='block'};
-$('resume').onclick=()=>{paused=false;$('pauseStrip').style.display='none'};
-$('quit').onclick=()=>{running=false;paused=false;$('raceHud').style.display='none';$('home').style.display='block'};
-$('again').onclick=startRace;$('homeBtn').onclick=()=>{$('finishStrip').style.display='none';$('raceHud').style.display='none';$('home').style.display='block'};
-window.addEventListener('keydown',e=>{let k=e.key.toLowerCase();if(['arrowleft','arrowright',' '].includes(k))e.preventDefault();if(k==='a'||k==='arrowleft')changeLane(-1);if(k==='d'||k==='arrowright')changeLane(1);if(k===' '&&running&&!paused)boost=true;if(k==='escape'&&running&&!finished){paused=!paused;$('pauseStrip').style.display=paused?'block':'none'}});
-window.addEventListener('keyup',e=>{if(e.key===' ')boost=false});
-window.addEventListener('blur',()=>boost=false);
-init();loop();
-})();
-</script>
-</body>
-</html>
+function walk(dt){let f=(keys.w||keys.arrowup||touch.forward?1:0)-(keys.s||keys.arrowdown||touch.back?1:0),r=(keys.d||keys.arrowright||touch.right?1:0)-(keys.a||keys.arrowleft||touch.left?1:0);let v=new THREE.Vector3(r,0,-f);if(v.lengthSq()){v.normalize().multiplyScalar(dt*14);player.position.add(v);player.position.x=THREE.MathUtils.clamp(player.position.x,-42,42);player.position.z=THREE.MathUtils.clamp(player.position.z,-42,42);player.rotation.y=Math.atan2(v.x,-v.z)}camera.position.x=THREE.MathUtils.damp(camera.position.x,player.position.x,dt*3);camera.position.z=THREE.MathUtils.damp(camera.position.z,player.position.z+17,dt*3);camera.lookAt(player.position.x,1,player.position.z-5)}
+function enter(){if(near<0)return;if(galaxies[near].open){location.href=galaxies[near].file}else{toastTime=1.8;$('toast').textContent=galaxies[near].name+' · COMING SOON';$('toast').style.display='block'}}
+function update(dt){walk(dt);let nearest=999,index=-1;nodes.forEach((n,i)=>{n.orb.rotation.y+=dt*.35;n.portal.rotation.z+=dt*.45;n.group.position.y=Math.sin(performance.now()*.001+i)*.18;let d=Math.hypot(player.position.x-n.x,player.position.z-n.z);if(d<nearest){nearest=d;index=i}});let found=nearest<8?index:-1;if(found!==near){near=found;if(near>=0){$('nearTitle').textContent=galaxies[near].name;$('nearDesc').textContent=galaxies[near].sub;$('enter').textContent=galaxies[near].open?'ENTER GALAXY →':'DISCOVER SOON';$('nearby').style.display='block'}else $('nearby').style.display='none'}if(toastTime>0){toastTime-=dt;if(toastTime<=0)$('toast').style.display='none'}}
+function loop(){requestAnimationFrame(loop);let dt=Math.min(clock.getDelta(),.05);update(dt);renderer.render(scene,camera)}window.addEventListener('keydown',e=>{let k=e.key.toLowerCase();keys[k]=true;if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();if(k==='enter')enter()});window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);document.querySelectorAll('[data-move]').forEach(b=>{let k=b.dataset.move;const on=e=>{e.preventDefault();touch[k]=true},off=()=>touch[k]=false;b.addEventListener('pointerdown',on);['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,off))});$('enter').onclick=enter;$('bank').textContent=localStorage.getItem('gxCrystalBank')||'0';init();loop()})();
+</script></body></html>
