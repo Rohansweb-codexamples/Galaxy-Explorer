@@ -722,7 +722,7 @@
             document.getElementById('btn-pause-toggle').addEventListener('click', () => toggleModal('modal-pause'));
 
             document.getElementById('btn-resume-sim').addEventListener('click', () => toggleModal('modal-pause'));
-            document.getElementById('btn-launch-crystalrush').addEventListener('click', () => { toggleModal('modal-arcade'); CrystalRush.launch(); });
+            document.getElementById('btn-launch-crystalrush').addEventListener('click', () => { window.location.href = 'crystal-rush.html'; });
             document.getElementById('btn-enter-world').addEventListener('click', triggerOrbitScan);
 
             document.getElementById('toggle-audio-fx').addEventListener('click', function() {
@@ -736,9 +736,15 @@
         }
 
         function triggerOrbitScan() {
-            if(!GameState.activePlanet) return; AudioFX.play('boost');
-            alert(`Synchronizing orbital network coordinates with ${GameState.activePlanet.name}.\nAtmospheric analysis: ${GameState.activePlanet.atmosphere}. Quantum tracking reward obtained.`);
-            GameState.addCrystals(250);
+            if(!GameState.activePlanet) return;
+            AudioFX.play('boost');
+            const planetId = GameState.activePlanet.id;
+            if (planetId === 0) {
+                window.location.href = 'crystal-rush.html';
+                return;
+            }
+            // Planet IDs 1–5 match the expedition worlds in world.html.
+            window.location.href = 'world.html?world=' + planetId;
         }
 
 
