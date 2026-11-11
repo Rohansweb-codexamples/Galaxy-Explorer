@@ -36,7 +36,7 @@ const worlds=[
 ];
 let saved={world:0,unlocked:0,credits:250,crystals:0,engine:1,hull:100,completed:[],total:0};
 try{const s=JSON.parse(localStorage.getItem('galaxyExplorerSave'));if(s)saved={...saved,...s}}catch(e){}
-let worldIndex=0,scene,camera,renderer,ship,shipGroup,clock=new THREE.Clock(),keys={},mouseX=0,mouseY=0,objects=[],collectibles=[],enemies=[],gate,scanPulse=null,selected=0,playing=false,paused=false,boosting=false,missionDone=false,velocity=new THREE.Vector3(),yaw=0,pitch=0,toastTimer;
+let worldIndex=0,scene,camera,renderer,ship,shipGroup,clock=new THREE.Clock(),keys={},mouseX=0,mouseY=0,objects=[],collectibles=[],enemies=[],gate,scanPulse=null,selected=0,playing=false,paused=false,boosting=false,missionDone=false,sectorCleared=false,velocity=new THREE.Vector3(),yaw=0,pitch=0,toastTimer;
 const mat=(c,em=0)=>new THREE.MeshStandardMaterial({color:c,roughness:.72,metalness:.18,emissive:c,emissiveIntensity:em});
 function save(){localStorage.setItem('galaxyExplorerSave',JSON.stringify(saved));}
 function say(t){$('toast').textContent=t;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2400);}
@@ -58,7 +58,7 @@ renderer.domElement.addEventListener('click',()=>{if(playing&&!paused&&innerWidt
 function clearWorld(){for(const o of objects)scene.remove(o);objects=[];collectibles=[];enemies=[];if(gate)scene.remove(gate);gate=null;if(scanPulse){scene.remove(scanPulse);scanPulse=null}}
 function add(obj){scene.add(obj);objects.push(obj);return obj}
 function makeWorld(idx){
-clearWorld();worldIndex=idx;saved.world=idx;missionDone=false;let w=worlds[idx];scene.fog.color.setHex(0x050b1b);scene.background=new THREE.Color(0x020611);
+clearWorld();worldIndex=idx;saved.world=idx;missionDone=false;sectorCleared=false;let w=worlds[idx];scene.fog.color.setHex(0x050b1b);scene.background=new THREE.Color(0x020611);
 let neb=new THREE.Mesh(new THREE.SphereGeometry(800,32,24),new THREE.MeshBasicMaterial({color:w.color,side:THREE.BackSide,transparent:true,opacity:.075}));add(neb);
 let planet=new THREE.Mesh(new THREE.SphereGeometry(36,48,32),new THREE.MeshStandardMaterial({color:w.planet,roughness:.95,metalness:.05}));planet.position.set(150,-45,-260);add(planet);
 let atmo=new THREE.Mesh(new THREE.SphereGeometry(38,48,32),new THREE.MeshBasicMaterial({color:w.color,transparent:true,opacity:.12,side:THREE.BackSide}));atmo.position.copy(planet.position);add(atmo);
@@ -73,7 +73,7 @@ function openOverlay(which){$('overlay').classList.remove('hide');['mainmenu','m
 function start(idx=saved.world){$('overlay').classList.add('hide');$('hud').classList.remove('hide');playing=true;paused=false;makeWorld(idx);save()}
 function mapOpen(){selected=worldIndex;renderWorlds();openOverlay('mapmenu');}
 function renderWorlds(){$('worldgrid').innerHTML='';worlds.forEach((w,i)=>{let d=document.createElement('div');d.className='world'+(i===selected?' sel':'')+(i>saved.unlocked?' lock':'');d.innerHTML='<div class="planet"></div><strong>'+(i>saved.unlocked?'LOCKED · ': '')+w.name+'</strong><span>'+w.desc+'</span>';if(i<=saved.unlocked)d.onclick=()=>{selected=i;renderWorlds()};$('worldgrid').appendChild(d)});$('travel').disabled=selected>saved.unlocked}
-function complete(){if(missionDone)return;missionDone=true;saved.completed=Array.from(new Set([...saved.completed,worldIndex]));saved.unlocked=Math.max(saved.unlocked,Math.min(worlds.length-1,worldIndex+1));saved.credits+=100;saved.total+=0;save();updateUI();$('endtext').textContent=worlds[worldIndex].name+' explored. You earned 100 credits. New navigation data has been added to your star map.';openOverlay('endmenu')}
+function complete(){if(sectorCleared)return;sectorCleared=true;saved.completed=Array.from(new Set([...saved.completed,worldIndex]));saved.unlocked=Math.max(saved.unlocked,Math.min(worlds.length-1,worldIndex+1));saved.credits+=100;saved.total+=0;save();updateUI();$('endtext').textContent=worlds[worldIndex].name+' explored. You earned 100 credits. New navigation data has been added to your star map.';openOverlay('endmenu')}
 function collect(c){if(c.userData.taken)return;c.userData.taken=true;c.visible=false;saved.credits+=25;let got=collectibles.filter(x=>x.userData.taken).length;updateUI();say('Energy crystal secured · +25 credits');if(got>=worlds[worldIndex].need){$('mission').textContent='All crystals collected. Locate the jump gate.';missionDone=true;updateUI();say('Jump gate activated!')}
 }
 function scan(){if(!playing||paused)return;if(scanPulse)scene.remove(scanPulse);scanPulse=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),new THREE.MeshBasicMaterial({color:0x64eaff,wireframe:true,transparent:true,opacity:.65}));scanPulse.position.copy(shipGroup.position);scanPulse.userData.age=0;scene.add(scanPulse);let found=collectibles.filter(c=>!c.userData.taken&&c.position.distanceTo(shipGroup.position)<75).length;say(found?found+' energy signature(s) detected nearby.':'Scan complete · no nearby crystals.');}
