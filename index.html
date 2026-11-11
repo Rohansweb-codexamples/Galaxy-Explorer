@@ -1,48 +1,1226 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>Galaxy Explorer — Galaxy Map</title>
-<style>
-:root{--cyan:#75edff;--gold:#ffd16e}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020611;color:#effaff;font-family:Inter,system-ui,Arial;touch-action:none}#stage{position:fixed;inset:0}canvas{display:block}#ui{position:fixed;inset:0;pointer-events:none}.glass{background:linear-gradient(145deg,#071831d9,#050c20cf);border:1px solid #79eaff55;box-shadow:0 12px 36px #0008,inset 0 1px #fff1;backdrop-filter:blur(13px);border-radius:17px}header{position:absolute;top:15px;left:18px;right:18px;display:flex;align-items:center;justify-content:space-between;gap:10px}.logo{font-size:12px;font-weight:1000;letter-spacing:.18em;text-shadow:0 0 18px #43dfff}.logo span{color:var(--gold)}.topRight{display:flex;gap:8px;align-items:center}.topAction{pointer-events:auto;padding:10px 12px;font-size:9px;border-radius:10px;background:linear-gradient(110deg,#075477,#253f91)}.pill{padding:10px 13px;font-size:10px;color:#a9c6e4;letter-spacing:.1em}.pill b{color:var(--gold);font-size:14px;margin-left:6px}#intro{position:absolute;left:clamp(16px,5vw,70px);top:95px;width:min(390px,75vw);padding:22px;pointer-events:auto} .eyebrow{color:var(--cyan);font-size:9px;letter-spacing:.25em;font-weight:950}h1{font-size:clamp(32px,5vw,55px);line-height:.9;letter-spacing:-.06em;margin:12px 0;background:linear-gradient(100deg,#fff,#71eaff 60%,#ffd078);color:transparent;background-clip:text}.desc{font-size:12px;color:#b6cce4;line-height:1.65;margin:0}.instructions{font-size:10px;color:#8eafd0;margin-top:14px;line-height:1.7}#nearby{position:absolute;left:50%;bottom:25px;transform:translateX(-50%);width:min(430px,90vw);padding:15px 18px;text-align:center;display:none;pointer-events:auto}#nearTitle{font-size:18px;font-weight:950;letter-spacing:.04em}#nearDesc{font-size:10px;color:#aac4df;margin:5px 0 12px}button{font:900 11px inherit;letter-spacing:.1em;color:#f0fcff;border:1px solid #83edff99;background:linear-gradient(105deg,#087da7,#3158b4);padding:13px 20px;border-radius:11px;cursor:pointer}button:active{transform:scale(.97)}#enter{width:100%;font-size:12px;padding:15px}#toast{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:15px 22px;display:none;text-align:center;font-size:12px;font-weight:900;letter-spacing:.08em}#touch{position:absolute;left:14px;bottom:18px;display:none;gap:8px;pointer-events:auto}.pad{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(2,45px);gap:4px}.pad button{padding:0;font-size:17px;background:#102c4ce8}.pad button:nth-child(1){grid-column:2}.pad button:nth-child(2){grid-column:1;grid-row:2}.pad button:nth-child(3){grid-column:2;grid-row:2}.pad button:nth-child(4){grid-column:3;grid-row:2}#mapHint{position:absolute;right:18px;bottom:22px;padding:12px 15px;font-size:9px;letter-spacing:.12em;color:#a9c8e6}@media(max-width:700px){header{top:9px;left:10px;right:10px}.logo{font-size:9px}.pill{padding:7px 8px;font-size:8px}#intro{top:64px;left:10px;width:min(300px,72vw);padding:15px}h1{font-size:36px}.desc{font-size:10px}.instructions{font-size:9px;margin-top:8px}#touch{display:block}#mapHint{right:10px;bottom:17px;font-size:8px;max-width:125px;text-align:right}#nearby{bottom:95px}}@media(hover:none) and (pointer:coarse){#touch{display:block}}
-</style></head><body><div id="stage"></div><div id="ui">
-<header><div class="logo">GALAXY <span>EXPLORER</span></div><div class="topRight"><button class="topAction" id="arcadeBtn">ARCADE</button><button class="topAction" id="fullBtn">FULLSCREEN</button><div class="glass pill">CRYSTALS <b id="bank">0</b></div><div class="glass pill">GALAXIES <b>6</b></div></div></header>
-<section id="intro" class="glass"><div class="eyebrow">THE GALACTIC PLAYGROUND</div><h1>CHOOSE YOUR<br>GALAXY</h1><p class="desc">Explore the star map like an intergalactic adventurer. Walk around the hub, discover glowing portals and choose which galaxy to visit.</p><div class="instructions">WASD / ARROW KEYS TO WALK<br>WALK UP TO A PORTAL TO EXPLORE IT<br>PRESS F FOR FULLSCREEN</div></section>
-<div id="nearby" class="glass"><div class="eyebrow">GALAXY DISCOVERED</div><div id="nearTitle">ORION NEBULA</div><div id="nearDesc">Enter this galaxy to play its mini-game.</div><button id="enter">ENTER GALAXY →</button></div>
-<div id="toast" class="glass">COMING SOON</div>
-<div id="touch"><div class="pad"><button data-move="forward">▲</button><button data-move="left">◀</button><button data-move="back">▼</button><button data-move="right">▶</button></div></div>
-<div id="mapHint" class="glass">EXPLORE THE HUB<br>FIND A PORTAL</div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-<script>
-(()=>{'use strict';const $=id=>document.getElementById(id);
-function startFallback(){
- const stage=$('stage'),c=document.createElement('canvas'),ctx=c.getContext('2d');stage.appendChild(c);c.style.width='100%';c.style.height='100%';
- let w=0,h=0,px=0,pz=0,last=0,stars=Array.from({length:420},()=>({x:Math.random(),y:Math.random(),z:Math.random()})),keys={},touch={forward:false,back:false,left:false,right:false};
- const worlds=[['ORION NEBULA','#35dcff'],['VERDANT PRIME','#70f59a'],['EMBERFALL','#ff7959'],['AZURE DRIFT','#588dff'],['NEBULA VEIL','#c17aff'],['THE SILENT MOON','#cbd5e8']];
- function size(){w=c.width=innerWidth*devicePixelRatio;h=c.height=innerHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);w=innerWidth;h=innerHeight}
- function sphere(x,y,r,color){let g=ctx.createRadialGradient(x-r*.35,y-r*.4,r*.08,x,y,r);g.addColorStop(0,'#ffffff');g.addColorStop(.18,color);g.addColorStop(.75,'#15264d');g.addColorStop(1,'#030817');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.strokeStyle=color;ctx.globalAlpha=.65;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y,r*1.5,r*.35,-.3,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1}
- function draw(t){let dt=Math.min((t-last)/1000||.016,.04);last=t;let f=(keys.w||keys.arrowup||touch.forward?1:0)-(keys.s||keys.arrowdown||touch.back?1:0),r=(keys.d||keys.arrowright||touch.right?1:0)-(keys.a||keys.arrowleft||touch.left?1:0);px=Math.max(-40,Math.min(40,px+r*dt*18));pz=Math.max(-40,Math.min(40,pz+f*dt*18));
- ctx.fillStyle='#030716';ctx.fillRect(0,0,w,h);let grad=ctx.createRadialGradient(w*.55,h*.4,5,w*.55,h*.4,Math.max(w,h)*.8);grad.addColorStop(0,'#102650');grad.addColorStop(.55,'#071329');grad.addColorStop(1,'#01030c');ctx.fillStyle=grad;ctx.fillRect(0,0,w,h);
- for(let st of stars){st.y+=dt*(.025+st.z*.09);if(st.y>1)st.y=0;ctx.fillStyle='rgba(190,230,255,'+(.25+st.z*.7)+')';ctx.fillRect(st.x*w,st.y*h,st.z*2+1,st.z*2+1)}
- sphere(w*.78,h*.25,Math.min(w,h)*.12,'#855bd5');
- let cx=w/2-px*3,cy=h*.55+pz*2,rad=Math.min(w,h)*.31;
- ctx.strokeStyle='#277eaa';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(cx,cy,rad*1.5,rad*.48,0,0,Math.PI*2);ctx.stroke();
- for(let i=0;i<6;i++){let a=i*Math.PI/3-Math.PI/2, x=cx+Math.cos(a)*rad*1.15,y=cy+Math.sin(a)*rad*.48;let rr=Math.min(w,h)*.055;sphere(x,y,rr,worlds[i][1]);ctx.fillStyle='#eafaff';ctx.font='bold '+Math.max(9,Math.min(14,w/100))+'px Arial';ctx.textAlign='center';ctx.fillText(worlds[i][0],x,y+rr+17)}
- sphere(cx,cy,Math.min(w,h)*.075,'#ffbd62');
- ctx.fillStyle='#dffaff';ctx.beginPath();ctx.arc(cx-px*2,cy+Math.min(w,h)*.11,9,0,Math.PI*2);ctx.fill();requestAnimationFrame(draw)}
- size();window.addEventListener('resize',size);window.addEventListener('keydown',e=>keys[e.key.toLowerCase()]=true);window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
- document.querySelectorAll('[data-move]').forEach(b=>{let k=b.dataset.move;b.addEventListener('pointerdown',e=>{e.preventDefault();touch[k]=true});['pointerup','pointerleave','pointercancel'].forEach(v=>b.addEventListener(v,()=>touch[k]=false))});
- requestAnimationFrame(draw);$('intro').insertAdjacentHTML('beforeend','<p style="color:#ffd16e;font-size:10px">2D fallback active — WebGL is unavailable. This is not the 3D game.</p>');
-}
-if(!window.THREE){startFallback();return}
-let scene,camera,renderer,clock=new THREE.Clock(),player,world,active=-1,near=-1,toastTime=0;const keys={},touch={forward:false,back:false,left:false,right:false};const galaxies=[{name:'ORION NEBULA',sub:'Crystal Rush · High-speed space race',color:0x34dfff,file:'crystal-rush.html',open:true},{name:'VERDANT PRIME',sub:'Explore alien forests and collect life crystals',color:0x69f58b,file:'world.html?world=1',open:true},{name:'EMBERFALL',sub:'Explore volcanic terrain and dodge lava vents',color:0xff805b,file:'world.html?world=2',open:true},{name:'AZURE DRIFT',sub:'Explore floating islands above an endless ocean',color:0x548bff,file:'world.html?world=3',open:true},{name:'NEBULA VEIL',sub:'Discover a mysterious purple crystal labyrinth',color:0xc17aff,file:'world.html?world=4',open:true},{name:'THE SILENT MOON',sub:'Explore abandoned lunar structures and secrets',color:0xcbd5e8,file:'world.html?world=5',open:true}];const nodes=[];
-function mat(c,e=0){return new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:e,roughness:.55,metalness:.25})}
-function labelSprite(text,color){let c=document.createElement('canvas');c.width=512;c.height=128;let x=c.getContext('2d');x.fillStyle='#07152be8';x.strokeStyle='#8ceeff';x.lineWidth=4;x.beginPath();x.roundRect(5,5,502,118,24);x.fill();x.stroke();x.font='900  thirtypx Arial';x.font='900  thirtypx Arial';x.font='900 34px Arial';x.textAlign='center';x.fillStyle='#ffffff';x.fillText(text,256,78);let t=new THREE.CanvasTexture(c);let s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true}));s.scale.set(10,2.5,1);return s}
-function makePlanet(d,i){let angle=i*Math.PI/3-Math.PI/2,x=Math.cos(angle)*27,z=Math.sin(angle)*27;let group=new THREE.Group();group.position.set(x,0,z);scene.add(group);let island=new THREE.Mesh(new THREE.CylinderGeometry(6.4,7.5,2.3,9),new THREE.MeshStandardMaterial({color:0x101d3c,metalness:.65,roughness:.35}));island.position.y=-.8;group.add(island);let rim=new THREE.Mesh(new THREE.TorusGeometry(6.1,.18,8,64),new THREE.MeshBasicMaterial({color:d.color}));rim.rotation.x=Math.PI/2;rim.position.y=.38;group.add(rim);let orb=new THREE.Mesh(new THREE.SphereGeometry(3.3,32,24),new THREE.MeshStandardMaterial({color:d.color,emissive:d.color,emissiveIntensity:.32,roughness:.25,metalness:.35}));orb.position.y=4.3;group.add(orb);let halo=new THREE.Mesh(new THREE.TorusGeometry(4.8,.12,8,64),new THREE.MeshBasicMaterial({color:d.color}));halo.rotation.x=1.15;halo.position.y=4.2;group.add(halo);let portal=new THREE.Mesh(new THREE.TorusGeometry(2.6,.22,12,48),new THREE.MeshBasicMaterial({color:d.color}));portal.position.y=1.4;portal.rotation.x=Math.PI/2;group.add(portal);let sprite=labelSprite(d.name,d.color);sprite.position.y=8.6;group.add(sprite);for(let k=0;k<4;k++){let crystal=new THREE.Mesh(new THREE.OctahedronGeometry(.65,0),new THREE.MeshBasicMaterial({color:d.color}));crystal.position.set(Math.cos(k*Math.PI/2)*4.7,1.5,Math.sin(k*Math.PI/2)*4.7);group.add(crystal)}nodes.push({group,x,z,data:d,orb,portal});}
-function init(){scene=new THREE.Scene();scene.background=new THREE.Color(0x030716);scene.fog=new THREE.FogExp2(0x030716,.008);camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,500);renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setSize(innerWidth,innerHeight);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.2;$('stage').appendChild(renderer.domElement);scene.add(new THREE.HemisphereLight(0x9bdfff,0x21113e,1.7));let sun=new THREE.PointLight(0x55cfff,180,130);sun.position.set(0,25,0);scene.add(sun);let floor=new THREE.Mesh(new THREE.CylinderGeometry(48,52,3,64),new THREE.MeshStandardMaterial({color:0x09172e,metalness:.55,roughness:.7}));floor.position.y=-2;scene.add(floor);let ring=new THREE.Mesh(new THREE.TorusGeometry(48,.3,8,180),new THREE.MeshBasicMaterial({color:0x2388ba}));ring.rotation.x=Math.PI/2;ring.position.y=-.4;scene.add(ring);for(let i=0;i<6;i++)makePlanet(galaxies[i],i);for(let i=0;i<6;i++){let a=i*Math.PI/3-Math.PI/2;let path=new THREE.Mesh(new THREE.BoxGeometry(2,.2,22),mat(0x17466a,.3));path.position.set(Math.cos(a)*13,-.25,Math.sin(a)*13);path.rotation.y=-a;scene.add(path)}let starGeo=new THREE.BufferGeometry(),p=[];for(let i=0;i<3000;i++)p.push((Math.random()-.5)*500,Math.random()*240-40,(Math.random()-.5)*500);starGeo.setAttribute('position',new THREE.Float32BufferAttribute(p,3));scene.add(new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xc5eaff,size:1.15})));let core=new THREE.Mesh(new THREE.IcosahedronGeometry(5,2),new THREE.MeshStandardMaterial({color:0xffc76a,emissive:0xff8a25,emissiveIntensity:1.4,metalness:.4,roughness:.3}));core.position.y=2;scene.add(core);let coreRing=new THREE.Mesh(new THREE.TorusGeometry(8,.16,8,90),new THREE.MeshBasicMaterial({color:0xffc76a}));coreRing.rotation.x=1.1;coreRing.position.y=2;scene.add(coreRing);
-// Central orbital station: layered docking rings, habitat modules and illuminated pylons.
-let station=new THREE.Group();scene.add(station);station.position.y=1.4;let stationMat=new THREE.MeshStandardMaterial({color:0x183d62,metalness:.82,roughness:.28});let stationGlow=new THREE.MeshBasicMaterial({color:0x48dfff});for(let j=0;j<3;j++){let sr=new THREE.Mesh(new THREE.TorusGeometry(10+j*2.4,.28-j*.035,10,120),j===1?new THREE.MeshBasicMaterial({color:0xffc66b}):stationGlow);sr.rotation.x=Math.PI/2+(j-1)*.18;sr.rotation.y=j*.35;station.add(sr)}let hubCore=new THREE.Mesh(new THREE.CylinderGeometry(4.1,5.2,3.2,12),stationMat);hubCore.position.y=1;station.add(hubCore);let dome=new THREE.Mesh(new THREE.SphereGeometry(3.2,24,16,0,Math.PI*2,0,Math.PI/2),new THREE.MeshStandardMaterial({color:0x2d8cb1,emissive:0x0a557c,emissiveIntensity:.7,metalness:.6,roughness:.2}));dome.position.y=2.6;station.add(dome);for(let j=0;j<8;j++){let a=j*Math.PI/4;let pod=new THREE.Mesh(new THREE.BoxGeometry(2.8,1.1,2),stationMat);pod.position.set(Math.cos(a)*8,1,Math.sin(a)*8);pod.rotation.y=-a;station.add(pod);let beacon=new THREE.Mesh(new THREE.SphereGeometry(.35,12,8),stationGlow);beacon.position.set(Math.cos(a)*8,1.8,Math.sin(a)*8);station.add(beacon)}player=new THREE.Group();let suit=new THREE.Mesh(new THREE.CapsuleGeometry(.65,1.1,5,10),mat(0xeaf8ff,.1));suit.position.y=1.1;player.add(suit);let visor=new THREE.Mesh(new THREE.SphereGeometry(.48,18,14),new THREE.MeshStandardMaterial({color:0x39dfff,emissive:0x087ba9,emissiveIntensity:1.2,metalness:.6,roughness:.15}));visor.position.set(0,2,.28);visor.scale.set(1,.78,.65);player.add(visor);let pack=new THREE.Mesh(new THREE.BoxGeometry(.75,.9,.35),mat(0x3566a5,.5));pack.position.set(0,1.15,-.55);player.add(pack);player.position.set(0,0,0);scene.add(player);camera.position.set(0,13,19);camera.lookAt(0,1,0);window.addEventListener('resize',resize)}
-function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}
-function walk(dt){let f=(keys.w||keys.arrowup||touch.forward?1:0)-(keys.s||keys.arrowdown||touch.back?1:0),r=(keys.d||keys.arrowright||touch.right?1:0)-(keys.a||keys.arrowleft||touch.left?1:0);let v=new THREE.Vector3(r,0,-f);if(v.lengthSq()){v.normalize().multiplyScalar(dt*14);player.position.add(v);player.position.x=THREE.MathUtils.clamp(player.position.x,-42,42);player.position.z=THREE.MathUtils.clamp(player.position.z,-42,42);player.rotation.y=Math.atan2(v.x,-v.z)}camera.position.x=THREE.MathUtils.damp(camera.position.x,player.position.x,dt*3);camera.position.z=THREE.MathUtils.damp(camera.position.z,player.position.z+17,dt*3);camera.lookAt(player.position.x,1,player.position.z-5)}
-function enter(){if(near<0)return;if(galaxies[near].open){location.href=galaxies[near].file}else{toastTime=1.8;$('toast').textContent=galaxies[near].name+' · COMING SOON';$('toast').style.display='block'}}
-function update(dt){walk(dt);let nearest=999,index=-1;nodes.forEach((n,i)=>{n.orb.rotation.y+=dt*.35;n.portal.rotation.z+=dt*.45;n.group.position.y=Math.sin(performance.now()*.001+i)*.18;let d=Math.hypot(player.position.x-n.x,player.position.z-n.z);if(d<nearest){nearest=d;index=i}});let found=nearest<8?index:-1;if(found!==near){near=found;if(near>=0){$('nearTitle').textContent=galaxies[near].name;$('nearDesc').textContent=galaxies[near].sub;$('enter').textContent=galaxies[near].open?'ENTER GALAXY →':'DISCOVER SOON';$('nearby').style.display='block'}else $('nearby').style.display='none'}if(toastTime>0){toastTime-=dt;if(toastTime<=0)$('toast').style.display='none'}}
-function loop(){requestAnimationFrame(loop);let dt=Math.min(clock.getDelta(),.05);update(dt);renderer.render(scene,camera)}window.addEventListener('keydown',e=>{let k=e.key.toLowerCase();keys[k]=true;if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();if(k==='enter')enter()});window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);document.querySelectorAll('[data-move]').forEach(b=>{let k=b.dataset.move;const on=e=>{e.preventDefault();touch[k]=true},off=()=>touch[k]=false;b.addEventListener('pointerdown',on);['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,off))});$('enter').onclick=enter;$('arcadeBtn').onclick=()=>location.href='crystal-rush.html';$('fullBtn').onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()};window.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='f'){if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()}});$('bank').textContent=localStorage.getItem('gxCrystalBank')||'0';try{init();loop()}catch(err){console.error('3D setup failed:',err);$('stage').innerHTML='';startFallback()}})();
-</script></body></html>
+# Galaxy Explorer - 3D Space Game with Twitch Interland World
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Galaxy Explorer - 3D Space Game</title>
+    <!-- Sci-Fi Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Three.js CDN via Whitelisted Domain Provider -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-blue: #0044ff;
+            --neon-gold: #ffaa00;
+
+            --neon-purple: #9146ff; /* Twitch Brand Purple */
+            --neon-red: #ff0055;
+            --glass-bg: rgba(10, 16, 30, 0.82);
+            --glass-border: rgba(0, 243, 255, 0.2);
+            --font-display: 'Orbitron', sans-serif;
+            --font-body: 'Rajdhani', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+            touch-action: none; /* Prevents default browser panning/zooming */
+        }
+
+        body, html {
+            width: 100%;
+
+            height: 100%;
+            overflow: hidden;
+            background-color: #020208;
+            font-family: var(--font-body);
+            color: #ffffff;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* WebGL Fallback Screen */
+        #webgl-fallback {
+            position: fixed;
+
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #050515 0%, #101030 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            font-family: var(--font-display);
+        }
+        #webgl-fallback.hidden { display: none !important; }
+        #webgl-fallback h1 { color: var(--neon-red); margin-bottom: 20px; text-shadow: 0 0 10px rgba(255,0,85,0.5); }
+
+        /* UI Overlay Systems */
+        .ui-layer {
+
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 15px;
+        }
+
+        .interactive {
+            pointer-events: auto;
+        }
+
+        /* Glassmorphic Panels */
+        .panel {
+
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 20px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 243, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .panel:hover {
+            border-color: rgba(0, 243, 255, 0.4);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.15);
+        }
+
+        /* Header / HUD */
+        .hud-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-title {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+        .brand-title span { color: var(--neon-cyan); }
+
+        .stats-container {
+            display: flex;
+            gap: 10px;
+        }
+
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            padding: 6px 14px !important;
+        }
+        .stat-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 1px;
+        }
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--neon-gold);
+            text-shadow: 0 0 8px rgba(255,170,0,0.4);
+        }
+
+        .stat-value.cyan {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0,243,255,0.4);
+        }
+
+        /* Actions & Navigation Menu */
+        .hud-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Interactive Buttons */
+        .btn {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            color: #fff;
+            font-family: var(--font-display);
+            font-size: 11px;
+            font-weight: 700;
+
+            text-transform: uppercase;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn:hover {
+            background: rgba(0, 243, 255, 0.25);
+            box-shadow: 0 0 15px var(--neon-cyan);
+            transform: translateY(-2px);
+        }
+        .btn:active { transform: translateY(0); }
+        .btn-gold {
+            border-color: var(--neon-gold);
+
+            background: rgba(255, 170, 0, 0.1);
+        }
+        .btn-gold:hover {
+            background: rgba(255, 170, 0, 0.25);
+            box-shadow: 0 0 15px var(--neon-gold);
+        }
+
+        /* Center / Context Dynamic UI Overlay */
+        .main-workspace {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Planet Info Panel */
+        .planet-card {
+            width: 320px;
+
+            position: absolute;
+            left: 20px;
+            top: 90px;
+            display: none;
+            animation: slideInLeft 0.4s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+        }
+        @keyframes slideInLeft {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .planet-card h2 {
+            font-family: var(--font-display);
+            font-size: 20px;
+            color: #fff;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+        }
+        .planet-type {
+
+            font-size: 12px;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        .planet-card.twitch-theme h2 { color: #fff; text-shadow: 0 0 10px var(--neon-purple); }
+        .planet-card.twitch-theme .planet-type { color: var(--neon-purple); }
+        
+        .planet-desc {
+            font-size: 14px;
+            line-height: 1.4;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 15px;
+        }
+        .planet-stats {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 10px;
+            margin-bottom: 15px;
+
+        }
+        .p-stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+        .p-stat-lbl { color: rgba(255,255,255,0.5); }
+        .p-stat-val { font-weight: 600; color: #fff; }
+
+        /* Full Screen Modals / Overlay Menus */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(2, 2, 8, 0.85);
+            backdrop-filter: blur(8px);
+
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            width: 90%;
+            max-width: 480px;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-content h2 {
+            font-family: var(--font-display);
+            font-size: 24px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+
+        /* Arcade Menu specific layout */
+        .arcade-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .arcade-item {
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+        }
+        .arcade-item.available {
+            border-color: var(--glass-border);
+        }
+        .arcade-info h3 {
+            font-family: var(--font-display);
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+        .arcade-info p {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+
+
+        /* Settings Toggle Matrix */
+        .settings-list {
+            text-align: left;
+            margin: 15px 0;
+        }
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        /* Crystal Rush HUD & Arcade Gameplay Overlay */
+        #arcade-hud {
+            position: absolute;
+            top: 75px;
+            left: 50%;
+            transform: translateX(-50%);
+
+            width: 90%;
+            max-width: 600px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+        }
+        .rush-metric {
+            background: rgba(10, 20, 40, 0.85);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-family: var(--font-display);
+            text-align: center;
+            min-width: 100px;
+        }
+        .rush-metric .val {
+            font-size: 18px;
+            font-weight: 700;
+
+            color: #fff;
+        }
+        .rush-metric .val.bonus { color: var(--neon-gold); }
+        .rush-metric .val.timer { color: var(--neon-cyan); }
+
+        /* Bottom Control Bar / Mobile Joysticks */
+        .hud-footer {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 50;
+        }
+
+        .controls-hint {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            display: flex;
+            gap: 12px;
+
+        }
+        .key-cap {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 4px;
+            padding: 1px 5px;
+            font-family: var(--font-display);
+            font-size: 10px;
+            color: #fff;
+        }
+
+        /* Mobile Controls Virtual Interface - Always Ready on Touch or Small Screens */
+        .mobile-touch-pane {
+            display: flex; /* Always display but handled responsively or overlayed */
+            width: 100%;
+            justify-content: space-between;
+            pointer-events: none;
+            padding: 0 5px 5px 5px;
+        }
+
+        .dpad-container {
+            width: 110px;
+            height: 110px;
+            position: relative;
+            background: rgba(255,255,255,0.04);
+            border: 2px solid rgba(0, 243, 255, 0.2);
+            border-radius: 50%;
+            pointer-events: auto;
+            backdrop-filter: blur(4px);
+        }
+        .touch-joystick {
+            width: 44px;
+            height: 44px;
+            background: radial-gradient(circle, var(--neon-cyan) 0%, var(--neon-blue) 100%);
+            border-radius: 50%;
+            position: absolute;
+            top: 31px;
+            left: 31px;
+            box-shadow: 0 0 15px var(--neon-cyan);
+
+            cursor: pointer;
+        }
+        .action-button-pane {
+            display: flex;
+            gap: 12px;
+            pointer-events: auto;
+            align-items: center;
+        }
+        .circle-action-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(10, 20, 45, 0.85);
+            border: 2px solid var(--neon-cyan);
+            color: #fff;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 11px;
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(0,243,255,0.2);
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .circle-action-btn:active {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-cyan);
+        }
+        .circle-action-btn.gold {
+            border-color: var(--neon-gold);
+            box-shadow: 0 0 10px rgba(255,170,0,0.2);
+        }
+        .circle-action-btn.gold:active {
+            background: var(--neon-gold);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-gold);
+
+        }
+
+        /* Screen state responsiveness modifications */
+        @media (max-width: 768px) {
+            .controls-hint { display: none; }
+            .brand-title { font-size: 16px; }
+            .hud-actions .btn:not(#btn-fullscreen-hud) { display: none; } /* keep fullscreen handy on header mobile */
+            .planet-card {
+                width: calc(100% - 10px);
+                top: auto;
+                bottom: 140px;
+                left: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fallback Screen for lack of WebGL -->
+
+    <div id="webgl-fallback" class="hidden">
+        <h1>Critical Core Alert</h1>
+        <p>Your systems/browser architecture does not support WebGL 3D rendering accelerates.</p>
+    </div>
+
+    <!-- 3D Graphics Viewport container -->
+    <div id="canvas-container"></div>
+
+    <!-- Main Dynamic GUI Overlay Systems -->
+    <div class="ui-layer">
+        
+        <!-- Header Matrix -->
+        <header class="hud-header interactive">
+            <div class="brand-title">
+                GALAXY <span>EXPLORER</span>
+            </div>
+            
+            <div class="stats-container">
+                <div class="panel stat-box">
+
+                    <div class="stat-label">Vault</div>
+                    <div id="hud-crystal-bank" class="stat-value">0000</div>
+                </div>
+                <div class="panel stat-box">
+                    <div class="stat-label">Coordinates</div>
+                    <div id="hud-location-tag" class="stat-value cyan">Hub Core</div>
+                </div>
+            </div>
+
+            <div class="hud-actions">
+                <button class="btn btn-gold" id="btn-arcade-menu">Arcade</button>
+                <button class="btn" id="btn-settings-toggle">Systems</button>
+                <button class="btn btn-gold" id="btn-fullscreen-hud">⛶ Fullscreen</button>
+                <button class="btn" id="btn-pause-toggle">Pause</button>
+            </div>
+        </header>
+
+        <!-- Crystal Rush Game HUD -->
+        <div id="arcade-hud" class="interactive">
+
+            <div class="rush-metric">
+                <div class="val timer" id="rush-timer">75.0s</div>
+            </div>
+            <div class="rush-metric">
+                <div class="val" id="rush-score">0000</div>
+            </div>
+            <div class="rush-metric">
+                <div class="val bonus" id="rush-boost">READY</div>
+            </div>
+        </div>
+
+        <!-- Central Workspace Window Contexts -->
+        <main class="main-workspace">
+            
+            <!-- Proximity Action Planet Card -->
+            <div class="panel planet-card interactive" id="proximity-planet-panel">
+                <h2 id="lbl-planet-name">Planet Name</h2>
+                <div id="lbl-planet-type" class="planet-type">Class-M Planet</div>
+                <p id="lbl-planet-desc" class="planet-desc">Detailed analytics description...</p>
+
+                <div class="planet-stats">
+                    <div class="p-stat-row">
+                        <span class="p-stat-lbl">Atmosphere</span>
+                        <span id="lbl-planet-atm" class="p-stat-val">Nitrogen</span>
+                    </div>
+                    <div class="p-stat-row">
+                        <span class="p-stat-lbl">Hazard Assessment</span>
+                        <span id="lbl-planet-hazard" class="p-stat-val">Minimal Risk</span>
+                    </div>
+                </div>
+                <button class="btn btn-gold" style="width: 100%;" id="btn-enter-world">Initiate Orbit Discovery</button>
+            </div>
+
+        </main>
+
+        <!-- Footer / Mechanical Mobile Joystick Elements -->
+        <footer class="hud-footer">
+            <div class="panel controls-hint">
+                <div><span class="key-cap">W</span><span class="key-cap">A</span><span class="key-cap">S</span><span class="key-cap">D</span> Thruster Navigation</div>
+
+                <div><span class="key-cap">⛶</span> Tap Fullscreen for immersive Mobile Play</div>
+            </div>
+
+            <!-- Mobile Touch Layout Framework - Unified for tablet/mobile interaction -->
+            <div class="mobile-touch-pane">
+                <div class="dpad-container" id="virtual-joystick-bound">
+                    <div class="touch-joystick" id="virtual-joystick-handle"></div>
+                </div>
+                
+                <div class="action-button-pane">
+                    <button class="circle-action-btn" id="mobile-action-boost">Boost</button>
+                    <button class="circle-action-btn gold" id="mobile-action-primary">Orbit</button>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals Overlay Blocks -->
+    <div class="modal-overlay" id="modal-pause">
+
+        <div class="panel modal-content interactive">
+            <h2>Systems Suspended</h2>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                <button class="btn" id="btn-resume-sim">Resume Expedition</button>
+                <button class="btn btn-gold" id="btn-modal-fullscreen">Toggle Fullscreen Mode</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration System Menu -->
+    <div class="modal-overlay" id="modal-settings">
+        <div class="panel modal-content interactive">
+            <h2>Systems Configuration</h2>
+            <div class="settings-list">
+                <div class="settings-row">
+                    <span>Audio Oscillators</span>
+                    <button class="btn btn-gold" id="toggle-audio-fx" style="padding: 5px 12px;">ENABLED</button>
+                </div>
+                <div class="settings-row">
+
+                    <span>Hyperdrive Density</span>
+                    <button class="btn" id="toggle-graphics-perf" style="padding: 5px 12px;">HIGH DETAILED</button>
+                </div>
+            </div>
+            <button class="btn" id="btn-close-settings" style="margin-top: 15px;">Save Configurations</button>
+        </div>
+    </div>
+
+    <!-- Arcade Terminal Matrix -->
+    <div class="modal-overlay" id="modal-arcade">
+        <div class="panel modal-content interactive">
+            <h2>Arcade Deck Simulator</h2>
+            <div class="arcade-grid">
+                <div class="arcade-item available">
+                    <div class="arcade-info">
+                        <h3>Crystal Rush 3D</h3>
+                        <p>High speed asteroid-lane navigation crystal aggregator.</p>
+                        <p style="font-size: 11px; color: var(--neon-gold); margin-top: 4px;">Record: <span id="lbl-high-score">0000</span> pts</p>
+                    </div>
+
+                    <button class="btn btn-gold" id="btn-launch-crystalrush">Launch</button>
+                </div>
+            </div>
+            <button class="btn" id="btn-close-arcade" style="margin-top: 25px;">Disconnect Terminal</button>
+        </div>
+    </div>
+
+    <!-- Interactive JS System Modules Engine -->
+    <script>
+        // Audio Architecture Programmatic Synthesizer
+        const AudioFX = {
+            ctx: null,
+            enabled: true,
+            init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+            play(type) {
+                if (!this.enabled) return;
+                this.init();
+                try {
+                    const osc = this.ctx.createOscillator();
+
+                    const gain = this.ctx.createGain();
+                    osc.connect(gain); gain.connect(this.ctx.destination);
+                    const now = this.ctx.currentTime;
+                    if (type === 'collect') {
+                        osc.type = 'triangle'; osc.frequency.setValueAtTime(587.33, now);
+                        osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+                        gain.gain.setValueAtTime(0.12, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.16);
+                        osc.start(now); osc.stop(now + 0.16);
+                    } else if (type === 'hit') {
+                        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(140, now);
+                        osc.frequency.linearRampToValueAtTime(30, now + 0.25);
+                        gain.gain.setValueAtTime(0.25, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
+                        osc.start(now); osc.stop(now + 0.28);
+                    } else if (type === 'boost') {
+                        osc.type = 'sine'; osc.frequency.setValueAtTime(200, now);
+                        osc.frequency.exponentialRampToValueAtTime(700, now + 0.35);
+                        gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                        osc.start(now); osc.stop(now + 0.4);
+                    } else if (type === 'click') {
+
+                        osc.type = 'sine'; osc.frequency.setValueAtTime(900, now);
+                        gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+                        osc.start(now); osc.stop(now + 0.04);
+                    }
+                } catch(e) {}
+            }
+        };
+
+        // Static Catalog containing 3D Interland Twitch Glitch Node
+        const PLANET_CATALOG = [
+            { id: 0, name: "Orion Nebula Core", type: "Crystalline Core", desc: "A cluster saturated with mineral matrices and cascading crystal fields.", atmosphere: "Ionized Plasma", hazard: "Kinetic Asteroids", color: 0xff00aa, radius: 4.5, pos: { x: -35, z: -25 } },
+            { id: 1, name: "Verdant Prime", type: "Bio-Luminescent Exo-World", desc: "An organic emerald sanctuary covered in hyper-dense vegetation and bioluminescent alien canopies.", atmosphere: "Oxygenated Aero-Shell", hazard: "Neuro-Spore Vectors", color: 0x00ff66, radius: 5.5, pos: { x: 40, z: -15 } },
+            { id: 2, name: "Emberfall Alpha", type: "Volcanic Engine", desc: "A geologically violent sphere containing basalt cracks and oceans of molten lava.", atmosphere: "Sulphuric Heavy Vapor", hazard: "Extreme Radiation", color: 0xff3300, radius: 6.0, pos: { x: -15, z: 45 } },
+            { id: 3, name: "Azure Drift", type: "Pelagic Domain", desc: "An aquatic planet punctuated by micro floating islands and marine canyons.", atmosphere: "Translucent Water Vapor", hazard: "Hyper-Cyclonic Vortex", color: 0x00aaff, radius: 5.0, pos: { x: 30, z: 35 } },
+            {
+                id: 4,
+                name: "Twitch Glitch Nexus",
+                type: "3D Interland Platform Matrix",
+                desc: "A stylized geometric network built entirely from vibrant low-poly purple floating voxel prisms, glowing stream conduits, and neon sub-islands.",
+
+                atmosphere: "Hypermedia Streaming Grid",
+                hazard: "Anomalous Glitch De-synchronization",
+                color: 0x9146ff, // Twitch Purple
+                radius: 5.2,
+                pos: { x: -42, z: 12 },
+                isInterland: true
+            },
+            { id: 5, name: "The Silent Moon", type: "Zero-G Outpost", desc: "A cratered lunar shell hosting the ruins of an abandoned research mega-station.", atmosphere: "Vacuum Deficit", hazard: "Micrometeorite Showers", color: 0x8899a6, radius: 3.5, pos: { x: 10, z: -40 } }
+        ];
+
+        const GameState = {
+            current: 'HUB',
+            crystalBank: 0, highScore: 0, activePlanet: null, graphicsHigh: true,
+            initStorage() {
+                this.crystalBank = parseInt(localStorage.getItem('ge_crystals')) || 0;
+                this.highScore = parseInt(localStorage.getItem('ge_highscore')) || 0;
+                document.getElementById('hud-crystal-bank').innerText = String(this.crystalBank).padStart(4, '0');
+                document.getElementById('lbl-high-score').innerText = String(this.highScore).padStart(4, '0');
+            },
+
+            addCrystals(qty) {
+                this.crystalBank += qty; localStorage.setItem('ge_crystals', this.crystalBank);
+                document.getElementById('hud-crystal-bank').innerText = String(this.crystalBank).padStart(4, '0');
+            },
+            saveHighScore(score) {
+                if(score > this.highScore) {
+                    this.highScore = score; localStorage.setItem('ge_highscore', this.highScore);
+                    document.getElementById('lbl-high-score').innerText = String(this.highScore).padStart(4, '0');
+                }
+            }
+        };
+
+        let scene, camera, renderer, starfield, spaceDust, spaceStation;
+        let planetMeshes = [];
+        let portalRings = [];
+        
+        const player = { mesh: null, pos: { x: 0, z: 0 }, speed: 0.52, rotation: 0, targetRotation: 0 };
+        const keys = { w:0, a:0, s:0, d:0, ArrowUp:0, ArrowLeft:0, ArrowDown:0, ArrowRight:0 };
+        
+
+        // Touch Joystick State Trackers
+        let joystickActive = false;
+        let joystickStart = { x: 0, y: 0 };
+        let joystickCurrent = { x: 0, y: 0 };
+        const joystickMaxDrag = 38;
+
+        const CrystalRush = {
+            active: false, score: 0, timeLeft: 75.0, lane: 0, targetX: 0, laneWidth: 8, speed: 0.65,
+            boostActive: false, boostTimer: 0, entities: [], spawnTimer: 0,
+            launch() {
+                AudioFX.play('boost'); GameState.current = 'CRYSTAL_RUSH';
+                document.getElementById('hud-location-tag').innerText = "Arcade Run";
+                document.getElementById('arcade-hud').style.display = 'flex';
+                document.getElementById('proximity-planet-panel').style.display = 'none';
+                this.score = 0; this.timeLeft = 75.0; this.lane = 0; this.targetX = 0; this.speed = 0.75;
+                this.boostActive = false; this.entities = []; this.spawnTimer = 0;
+                document.getElementById('rush-score').innerText = "0000";
+                document.getElementById('rush-timer').innerText = "75.0s";
+                document.getElementById('rush-boost').innerText = "READY";
+
+                document.getElementById('rush-boost').className = "val bonus";
+                buildArcadeScene();
+            },
+            terminate(completed = true) {
+                this.active = false; document.getElementById('arcade-hud').style.display = 'none';
+                if (completed) { GameState.addCrystals(this.score); GameState.saveHighScore(this.score); }
+                GameState.current = 'HUB'; document.getElementById('hud-location-tag').innerText = "Hub Core";
+                buildHubScene();
+            },
+            triggerBoost() {
+                if(!this.boostActive && this.timeLeft > 0) {
+                    this.boostActive = true; this.boostTimer = 3.0; this.speed = 1.6;
+                    AudioFX.play('boost'); document.getElementById('rush-boost').innerText = "OVERDRIVE";
+                    document.getElementById('rush-boost').className = "val";
+                }
+            }
+        };
+
+        function initGraphicsEngine() {
+
+            const container = document.getElementById('canvas-container');
+            try {
+                scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x020208, 0.009);
+                camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+                renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                container.appendChild(renderer.domElement);
+                
+                window.addEventListener('resize', () => {
+                    camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            } catch (err) {
+                document.getElementById('webgl-fallback').classList.remove('hidden'); return false;
+            }
+            return true;
+        }
+
+
+        function clearThreeScene() {
+            while(scene.children.length > 0){ scene.remove(scene.children[0]); }
+            planetMeshes = []; portalRings = []; CrystalRush.entities = [];
+        }
+
+        function createNebulaParticle() {
+            const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            const grad = ctx.createRadialGradient(32,32,0, 32,32,32);
+            grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            grad.addColorStop(0.5, 'rgba(145, 70, 255, 0.3)');
+            grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, 64, 64);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function addGlobalBackground(particleDensity = 1.0) {
+            scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+            const dl = new THREE.DirectionalLight(0x00f3ff, 0.8); dl.position.set(20, 40, 15); scene.add(dl);
+
+
+            const totalStars = 3000 * particleDensity;
+            const starGeo = new THREE.BufferGeometry(); const starCoords = new Float32Array(totalStars * 3);
+            for(let i=0; i < totalStars * 3; i++) { starCoords[i] = (Math.random() - 0.5) * 550; }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(starCoords, 3));
+            starfield = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.75, transparent: true, opacity: 0.9 }));
+            scene.add(starfield);
+
+            const dustCount = 600 * particleDensity;
+            const dustGeo = new THREE.BufferGeometry(); const dustCoords = new Float32Array(dustCount * 3);
+            for(let i=0; i<dustCount*3; i+=3) {
+                dustCoords[i] = (Math.random() - 0.5) * 250; dustCoords[i+1] = (Math.random() - 0.5) * 60; dustCoords[i+2] = (Math.random() - 0.5) * 250;
+            }
+            dustGeo.setAttribute('position', new THREE.BufferAttribute(dustCoords, 3));
+            spaceDust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ size: 2.5, map: createNebulaParticle(), transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false }));
+            scene.add(spaceDust);
+        }
+
+        function buildHubScene() {
+            clearThreeScene();
+
+            addGlobalBackground(GameState.graphicsHigh ? 1.0 : 0.4);
+
+            // Center Matrix Futuristic Space Station
+            spaceStation = new THREE.Group();
+            const coreMesh = new THREE.Mesh(new THREE.SphereGeometry(3.2, 16, 16), new THREE.MeshStandardMaterial({ color: 0x1d2936, metalness: 0.9, roughness: 0.1, emissive: 0x001122 }));
+            spaceStation.add(coreMesh);
+            const stationRing = new THREE.Mesh(new THREE.TorusGeometry(6.5, 0.5, 8, 36), new THREE.MeshStandardMaterial({ color: 0x4f6173, metalness: 0.8 }));
+            stationRing.rotation.x = Math.PI / 2; spaceStation.add(stationRing);
+            spaceStation.position.set(0, 0, 0); scene.add(spaceStation);
+
+            // Compile Stellar Worlds List
+            PLANET_CATALOG.forEach((pData) => {
+                const pGroup = new THREE.Group();
+                pGroup.position.set(pData.pos.x, 0, pData.pos.z);
+                
+                if (pData.isInterland) {
+                    // Custom 3D Interland low-poly voxel citadel arrangement
+                    const centerCoreBlock = new THREE.Mesh(
+                        new THREE.BoxGeometry(pData.radius * 1.2, pData.radius * 1.2, pData.radius * 1.2),
+
+                        new THREE.MeshStandardMaterial({ color: 0x9146ff, roughness: 0.2, flatShading: true, emissive: 0x1a0533 })
+                    );
+                    pGroup.add(centerCoreBlock);
+
+                    // Add surrounding floating low-poly islet blocks
+                    const subIslandsCount = 5;
+                    for (let s = 0; s < subIslandsCount; s++) {
+                        const blockW = 1.5 + Math.random() * 2;
+                        const blockGeo = new THREE.BoxGeometry(blockW, blockW * 0.6, blockW);
+                        const blockMat = new THREE.MeshStandardMaterial({ 
+                            color: s % 2 === 0 ? 0xffffff : 0x00f3ff, 
+                            flatShading: true,
+                            emissive: s % 2 === 0 ? 0x222222 : 0x002233
+                        });
+                        const subBlock = new THREE.Mesh(blockGeo, blockMat);
+                        
+                        const angle = (s / subIslandsCount) * Math.PI * 2;
+                        const orbitDist = pData.radius + 2.0;
+                        subBlock.position.set(Math.cos(angle) * orbitDist, (Math.random() - 0.5) * 2, Math.sin(angle) * orbitDist);
+
+                        subBlock.rotation.set(Math.random(), Math.random(), 0);
+                        pGroup.add(subBlock);
+                    }
+                } else {
+                    // Standard structural planetary body shapes
+                    const segs = GameState.graphicsHigh ? 24 : 12;
+                    const planetMesh = new THREE.Mesh(
+                        new THREE.SphereGeometry(pData.radius, segs, segs),
+                        new THREE.MeshStandardMaterial({ color: pData.color, metalness: 0.3, roughness: 0.6, flatShading: pData.id === 5 })
+                    );
+                    pGroup.add(planetMesh);
+                }
+
+                // Glowing Proximity Activation Rings
+                const portal = new THREE.Mesh(
+                    new THREE.TorusGeometry(pData.radius + 3.8, 0.08, 4, 20),
+                    new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.35, wireframe: true })
+                );
+                portal.rotation.x = Math.PI / 2; pGroup.add(portal);
+
+                portalRings.push(portal);
+
+                scene.add(pGroup);
+                planetMeshes.push({ id: pData.id, group: pGroup, interactionRadius: pData.radius + 3.8, data: pData });
+            });
+
+            // Build structural representation for Player's starship vessel element
+            player.mesh = new THREE.Group();
+            const shipBody = new THREE.Mesh(new THREE.ConeGeometry(0.5, 2.0, 10), new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.7 }));
+            shipBody.rotateX(Math.PI / 2); player.mesh.add(shipBody);
+            
+            const wingMesh = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.1, 0.5), shipBody.material);
+            wingMesh.position.set(0, -0.1, -0.2); player.mesh.add(wingMesh);
+
+            player.mesh.position.set(player.pos.x, 0.15, player.pos.z);
+            scene.add(player.mesh);
+
+            camera.position.set(player.pos.x, 15, player.pos.z + 18);
+            camera.lookAt(player.mesh.position);
+
+        }
+
+        function buildArcadeScene() {
+            clearThreeScene();
+            addGlobalBackground(GameState.graphicsHigh ? 0.7 : 0.3);
+
+            const trackLength = 300;
+            const trackFloor = new THREE.Mesh(new THREE.BoxGeometry(24, 0.15, trackLength), new THREE.MeshStandardMaterial({ color: 0x0a0f24, transparent: true, opacity: 0.85 }));
+            trackFloor.position.set(0, -1, -trackLength / 2 + 10); scene.add(trackFloor);
+
+            for(let laneX of [-12, -4, 4, 12]) {
+                const line = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.2, trackLength), new THREE.MeshBasicMaterial({ color: 0x00f3ff, opacity: 0.3, transparent: true }));
+                line.position.set(laneX, -0.9, -trackLength / 2 + 10); scene.add(line);
+            }
+
+            player.mesh = new THREE.Group();
+            const racer = new THREE.Mesh(new THREE.ConeGeometry(0.6, 2.2, 4), new THREE.MeshStandardMaterial({ color: 0xffaa00, emissive: 0x221100 }));
+            racer.rotateX(Math.PI / 2); player.mesh.add(racer);
+            player.mesh.position.set(0, 0, 0); scene.add(player.mesh);
+
+
+            camera.position.set(0, 4.2, 7.0); camera.lookAt(new THREE.Vector3(0, 1, -10));
+        }
+
+        function spawnArcadeEntity() {
+            const lane = Math.floor(Math.random() * 3) - 1;
+            const spawnZ = -175;
+            const isGem = Math.random() > 0.45;
+            let mesh;
+
+            if (isGem) {
+                mesh = new THREE.Mesh(new THREE.OctahedronGeometry(0.75, 0), new THREE.MeshBasicMaterial({ color: 0x00f3ff }));
+                mesh.userData = { type: 'GEM', value: 100, hit: false, radius: 0.85 };
+            } else {
+                mesh = new THREE.Mesh(new THREE.DodecahedronGeometry(1.3, 0), new THREE.MeshStandardMaterial({ color: 0x383545, roughness: 0.9, flatShading: true }));
+                mesh.userData = { type: 'ASTEROID', value: -75, hit: false, radius: 1.35, rotSpeed: (Math.random()-0.5)*0.04 };
+            }
+            mesh.position.set(lane * CrystalRush.laneWidth, 0, spawnZ);
+            scene.add(mesh); CrystalRush.entities.push(mesh);
+        }
+
+
+        function executeFramePulse() {
+            requestAnimationFrame(executeFramePulse);
+            if (GameState.current === 'HUB') updateHubSimulation();
+            else if (GameState.current === 'CRYSTAL_RUSH') updateArcadeSimulation();
+            renderer.render(scene, camera);
+        }
+
+        function updateHubSimulation() {
+            if(starfield) starfield.rotation.y += 0.0002;
+            if(spaceDust) spaceDust.rotation.y -= 0.0004;
+            if(spaceStation) spaceStation.rotation.y += 0.003;
+
+            planetMeshes.forEach((pObj, idx) => {
+                // Rotate standard or custom Interland components
+                pObj.group.children[0].rotation.y += 0.005 + (idx * 0.001);
+                if (pObj.data.isInterland) {
+                    // Make low poly platforms float up and down slightly
+                    for (let c = 1; c < pObj.group.children.length - 1; c++) {
+                        pObj.group.children[c].position.y = Math.sin(Date.now() * 0.002 + c) * 0.4;
+
+                        pObj.group.children[c].rotation.x += 0.005;
+                    }
+                }
+                const ring = portalRings[idx];
+                if(ring) {
+                    ring.rotation.z += 0.008;
+                    ring.scale.setScalar(1.0 + Math.sin(Date.now() * 0.0025 + idx) * 0.03);
+                }
+            });
+
+            let moveX = 0, moveZ = 0;
+            if (keys.w || keys.ArrowUp) moveZ -= 1;
+            if (keys.s || keys.ArrowDown) moveZ += 1;
+            if (keys.a || keys.ArrowLeft) moveX -= 1;
+            if (keys.d || keys.ArrowRight) moveX += 1;
+
+            if (joystickActive) {
+                moveX = Math.max(-1, Math.min(1, (joystickCurrent.x - joystickStart.x) / joystickMaxDrag));
+                moveZ = Math.max(-1, Math.min(1, (joystickCurrent.y - joystickStart.y) / joystickMaxDrag));
+
+            }
+
+            if (moveX !== 0 || moveZ !== 0) {
+                const len = Math.sqrt(moveX*moveX + moveZ*moveZ);
+                player.pos.x += (moveX / len) * player.speed; player.pos.z += (moveZ / len) * player.speed;
+                player.targetRotation = Math.atan2(-moveX, -moveZ);
+                let diff = player.targetRotation - player.rotation;
+                while (diff < -Math.PI) diff += Math.PI * 2; while (diff > Math.PI) diff -= Math.PI * 2;
+                player.rotation += diff * 0.16; player.mesh.rotation.y = player.rotation;
+                player.mesh.rotation.z = -moveX * 0.22;
+            } else {
+                player.mesh.rotation.z *= 0.8;
+            }
+
+            const bound = 80;
+            player.pos.x = Math.max(-bound, Math.min(bound, player.pos.x));
+            player.pos.z = Math.max(-bound, Math.min(bound, player.pos.z));
+            player.mesh.position.set(player.pos.x, 0.15, player.pos.z);
+
+
+            camera.position.x += (player.pos.x - camera.position.x) * 0.08;
+            camera.position.z += ((player.pos.z + 19) - camera.position.z) * 0.08;
+            camera.position.y += (14 - camera.position.y) * 0.08;
+            camera.lookAt(player.mesh.position);
+
+            let activeNode = null;
+            for(let i=0; i<planetMeshes.length; i++) {
+                const p = planetMeshes[i];
+                const dx = player.pos.x - p.group.position.x; const dz = player.pos.z - p.group.position.z;
+                if (Math.sqrt(dx*dx + dz*dz) < p.interactionRadius) { activeNode = p; break; }
+            }
+
+            const card = document.getElementById('proximity-planet-panel');
+            if (activeNode) {
+                if (GameState.activePlanet !== activeNode.data) {
+                    GameState.activePlanet = activeNode.data;
+                    document.getElementById('lbl-planet-name').innerText = activeNode.data.name;
+                    document.getElementById('lbl-planet-type').innerText = activeNode.data.type;
+                    document.getElementById('lbl-planet-desc').innerText = activeNode.data.desc;
+
+                    document.getElementById('lbl-planet-atm').innerText = activeNode.data.atmosphere;
+                    document.getElementById('lbl-planet-hazard').innerText = activeNode.data.hazard;
+                    
+                    // Add distinctive styling logic for Twitch Interland module interface
+                    if (activeNode.data.isInterland) {
+                        card.classList.add('twitch-theme');
+                    } else {
+                        card.classList.remove('twitch-theme');
+                    }
+                    card.style.display = 'block';
+                    activeNode.group.children[activeNode.group.children.length - 1].material.color.setHex(0x00f3ff);
+                }
+            } else if (GameState.activePlanet !== null) {
+                planetMeshes.forEach(p => p.group.children[p.group.children.length - 1].material.color.setHex(0xffaa00));
+                GameState.activePlanet = null; card.style.display = 'none';
+            }
+        }
+
+        function updateArcadeSimulation() {
+
+            if(starfield) starfield.rotation.z += 0.001;
+            if(CrystalRush.timeLeft > 0) {
+                CrystalRush.timeLeft -= 0.01667;
+                if(CrystalRush.timeLeft <= 0) {
+                    CrystalRush.timeLeft = 0; document.getElementById('rush-timer').innerText = "0.0s";
+                    alert(`Simulation complete! Aggregated score: ${CrystalRush.score}`);
+                    CrystalRush.terminate(true); return;
+                }
+                document.getElementById('rush-timer').innerText = CrystalRush.timeLeft.toFixed(1) + "s";
+            }
+
+            if(CrystalRush.boostActive) {
+                CrystalRush.boostTimer -= 0.01667;
+                camera.position.x = (Math.random() - 0.5) * 0.12;
+                if(CrystalRush.boostTimer <= 0) {
+                    CrystalRush.boostActive = false; CrystalRush.speed = 0.65;
+                    document.getElementById('rush-boost').innerText = "DEPLETED";
+                    document.getElementById('rush-boost').className = "val";
+                }
+
+            } else { camera.position.x = 0; }
+
+            if (keys.a || keys.ArrowLeft) CrystalRush.lane = -1;
+            if (keys.d || keys.ArrowRight) CrystalRush.lane = 1;
+            if (keys.w || keys.s || keys.ArrowUp || keys.ArrowDown) CrystalRush.lane = 0;
+
+            const targetX = CrystalRush.lane * CrystalRush.laneWidth;
+            player.mesh.position.x += (targetX - player.mesh.position.x) * 0.22;
+            player.mesh.rotation.z = -(player.mesh.position.x - targetX) * 0.12;
+
+            CrystalRush.spawnTimer++;
+            if(CrystalRush.spawnTimer >= (CrystalRush.boostActive ? 12 : 24)) {
+                CrystalRush.spawnTimer = 0; spawnArcadeEntity();
+            }
+
+            for (let i = CrystalRush.entities.length - 1; i >= 0; i--) {
+                const ent = CrystalRush.entities[i]; ent.position.z += CrystalRush.speed;
+                if(ent.userData.type === 'ASTEROID') ent.rotation.x += ent.userData.rotSpeed;
+
+
+                if(!ent.userData.hit && ent.position.z >= -0.8 && ent.position.z <= 1.2) {
+                    if(Math.abs(ent.position.x - player.mesh.position.x) < (ent.userData.radius + 0.5)) {
+                        ent.userData.hit = true;
+                        if(ent.userData.type === 'GEM') { CrystalRush.score += 100; AudioFX.play('collect'); }
+                        else { CrystalRush.score = Math.max(0, CrystalRush.score - 75); AudioFX.play('hit'); }
+                        document.getElementById('rush-score').innerText = String(CrystalRush.score).padStart(4, '0');
+                        scene.remove(ent); CrystalRush.entities.splice(i, 1); continue;
+                    }
+                }
+                if(ent.position.z > 10) { scene.remove(ent); CrystalRush.entities.splice(i, 1); }
+            }
+        }
+
+        function triggerRequestFullscreen() {
+            AudioFX.play('click');
+            const docEl = document.documentElement;
+            const requestFS = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
+            const exitFS = document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen;
+
+
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (requestFS) requestFS.call(docEl).catch(() => {});
+            } else {
+                if (exitFS) exitFS.call(document);
+            }
+        }
+
+        function registerControlHandlers() {
+            window.addEventListener('keydown', (e) => {
+                if(e.key === 'Escape' || e.key === 'Esc') { toggleModal('modal-pause'); return; }
+                const lower = e.key.toLowerCase(); if(lower in keys) keys[lower] = 1; if(e.key in keys) keys[e.key] = 1;
+            });
+            window.addEventListener('keyup', (e) => {
+                const lower = e.key.toLowerCase(); if(lower in keys) keys[lower] = 0; if(e.key in keys) keys[e.key] = 0;
+            });
+
+            // Enhanced Mobile D-Pad Touch Interface with scrolling lockouts
+            const bound = document.getElementById('virtual-joystick-bound');
+            const handle = document.getElementById('virtual-joystick-handle');
+
+
+            const handleTouchStart = (e) => {
+                e.preventDefault(); joystickActive = true;
+                const t = e.touches[0]; joystickStart = { x: t.clientX, y: t.clientY };
+                joystickCurrent = { x: t.clientX, y: t.clientY }; AudioFX.play('click');
+            };
+
+            const handleTouchMove = (e) => {
+                if(!joystickActive) return; e.preventDefault();
+                const t = e.touches[0]; joystickCurrent = { x: t.clientX, y: t.clientY };
+                let dx = joystickCurrent.x - joystickStart.x; let dy = joystickCurrent.y - joystickStart.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                if(dist > joystickMaxDrag) { dx = (dx / dist) * joystickMaxDrag; dy = (dy / dist) * joystickMaxDrag; }
+                handle.style.transform = `translate(${dx}px, ${dy}px)`;
+            };
+
+            const handleTouchEnd = (e) => {
+                joystickActive = false; handle.style.transform = `translate(0px, 0px)`;
+                keys.w = keys.a = keys.s = keys.d = 0;
+            };
+
+
+            bound.addEventListener('touchstart', handleTouchStart, { passive: false });
+            bound.addEventListener('touchmove', handleTouchMove, { passive: false });
+            bound.addEventListener('touchend', handleTouchEnd); bound.addEventListener('touchcancel', handleTouchEnd);
+
+            // Bind Interface Buttons Action Hooks
+            document.getElementById('mobile-action-primary').addEventListener('click', () => {
+                if(GameState.current === 'HUB' && GameState.activePlanet) triggerOrbitScan();
+            });
+            document.getElementById('mobile-action-boost').addEventListener('click', () => {
+                if(GameState.current === 'CRYSTAL_RUSH') CrystalRush.triggerBoost();
+            });
+
+            // Action Triggers Linkups
+            document.getElementById('btn-fullscreen-hud').addEventListener('click', triggerRequestFullscreen);
+            document.getElementById('btn-modal-fullscreen').addEventListener('click', triggerRequestFullscreen);
+            
+            document.getElementById('btn-arcade-menu').addEventListener('click', () => toggleModal('modal-arcade'));
+            document.getElementById('btn-close-arcade').addEventListener('click', () => toggleModal('modal-arcade'));
+            document.getElementById('btn-settings-toggle').addEventListener('click', () => toggleModal('modal-settings'));
+
+            document.getElementById('btn-close-settings').addEventListener('click', () => toggleModal('modal-settings'));
+            document.getElementById('btn-pause-toggle').addEventListener('click', () => toggleModal('modal-pause'));
+            document.getElementById('btn-resume-sim').addEventListener('click', () => toggleModal('modal-pause'));
+            document.getElementById('btn-launch-crystalrush').addEventListener('click', () => { toggleModal('modal-arcade'); CrystalRush.launch(); });
+            document.getElementById('btn-enter-world').addEventListener('click', triggerOrbitScan);
+
+            document.getElementById('toggle-audio-fx').addEventListener('click', function() {
+                AudioFX.enabled = !AudioFX.enabled; this.innerText = AudioFX.enabled ? "ENABLED" : "MUTED"; AudioFX.play('click');
+            });
+            document.getElementById('toggle-graphics-perf').addEventListener('click', function() {
+                GameState.graphicsHigh = !GameState.graphicsHigh; this.innerText = GameState.graphicsHigh ? "HIGH DETAILED" : "ENERGY SAVING";
+                AudioFX.play('click');
+                if(GameState.current === 'HUB') buildHubScene(); else if(GameState.current === 'CRYSTAL_RUSH') buildArcadeScene();
+            });
+        }
+
+        function triggerOrbitScan() {
+            if(!GameState.activePlanet) return; AudioFX.play('boost');
+            alert(`Synchronizing orbital network coordinates with ${GameState.activePlanet.name}.\nAtmospheric analysis: ${GameState.activePlanet.atmosphere}. Quantum tracking reward obtained.`);
+
+            GameState.addCrystals(250);
+        }
+
+        function toggleModal(id) {
+            AudioFX.play('click'); const el = document.getElementById(id);
+            if(el.classList.contains('active')) el.classList.remove('active');
+            else { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active')); el.add('active'); }
+        }
+
+        window.onload = function() {
+            GameState.initStorage();
+            if (initGraphicsEngine()) { buildHubScene(); registerControlHandlers(); executeFramePulse(); }
+        };
+    </script>
+</body>
+</html>
+
+
