@@ -34,7 +34,7 @@ button:active{transform:scale(.96);filter:brightness(1.2)}
 #missionText{font-size:11px;line-height:1.5;color:#dcefff}
 #scorePanel{position:absolute;top:72px;right:16px;padding:12px 16px;text-align:right;min-width:120px}
 #score{font-size:27px;font-weight:950;color:#fff;text-shadow:0 0 17px #39dfff}
-#scorePanel small{font-size:9px;letter-spacing:.16em;color:#9ab6d5}
+#scorePanel small{font-size:9px;letter-spacing:.16em;color:#9ab6d5}#timerPanel{position:absolute;top:72px;left:50%;transform:translateX(-50%);padding:10px 17px;text-align:center;min-width:94px}#timer{font-size:25px;font-weight:950;color:#ffd16e;text-shadow:0 0 16px #ffad42}#timerPanel small{font-size:8px;letter-spacing:.18em;color:#9ab6d5}
 #speedline{position:absolute;left:50%;top:15%;transform:translateX(-50%);font-size:10px;letter-spacing:.28em;color:#b9f7ff;text-shadow:0 0 14px #38cfff;opacity:.75}
 #notice{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:1000;font-size:clamp(18px,4vw,34px);letter-spacing:.08em;color:#fff;text-shadow:0 0 24px #ffb34d;opacity:0;transition:opacity .2s;white-space:nowrap}
 #notice.on{opacity:1}
@@ -54,7 +54,7 @@ button:active{transform:scale(.96);filter:brightness(1.2)}
  header{top:8px;left:9px;right:9px}.logo{font-size:9px;letter-spacing:.12em}.stat{padding:7px 8px;font-size:8px}.stat b{font-size:11px}
  #homePanel{left:5vw;top:50%;width:90vw;padding:22px;transform:translateY(-50%)}h1{font-size:clamp(48px,13vw,70px)}
  .lead{font-size:11px}.gameCard{padding:11px;margin-top:17px}.gameIcon{width:54px;height:54px}.gameInfo strong{font-size:13px}
- #mission{top:52px;left:8px;padding:9px;width:52vw;border-radius:12px}#scorePanel{top:52px;right:8px;padding:8px 10px;min-width:90px;border-radius:12px}#score{font-size:21px}
+ #mission{top:52px;left:8px;padding:9px;width:52vw;border-radius:12px}#timerPanel{top:52px;padding:7px 10px;min-width:68px}#timer{font-size:19px}#scorePanel{top:52px;right:8px;padding:8px 10px;min-width:90px;border-radius:12px}#score{font-size:21px}
  #speedline{top:22%;font-size:8px}#touch{display:flex}.touchBtn{width:58px;height:58px}#pauseBtn{right:8px;bottom:88px}
  #notice{top:42%}
 }
@@ -77,7 +77,7 @@ button:active{transform:scale(.96);filter:brightness(1.2)}
 </section>
 <section id="raceHud">
  <div id="mission" class="glass"><div class="smallLabel">CRYSTAL RUSH · SECTOR 01</div><div id="missionText">Stay sharp. Collect crystals and avoid the debris.</div></div>
- <div id="scorePanel" class="glass"><small>RACE SCORE</small><div id="score">0</div><small id="combo">CRYSTALS 0</small></div>
+ <div id="timerPanel" class="glass"><small>TIME LEFT</small><div id="timer">75</div></div><div id="scorePanel" class="glass"><small>RACE SCORE</small><div id="score">0</div><small id="combo">CRYSTALS 0</small></div>
  <div id="speedline">WARP SPEED　/　ORION NEBULA</div><div id="notice"></div>
  <div id="touch"><div class="touchGroup"><button class="touchBtn" id="leftBtn">◀</button><button class="touchBtn" id="rightBtn">▶</button></div><div class="touchGroup"><button id="boostBtn">BOOST</button></div></div>
  <button id="pauseBtn">Ⅱ　PAUSE</button>
@@ -89,7 +89,7 @@ button:active{transform:scale(.96);filter:brightness(1.2)}
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
-if(!window.THREE){$('homePanel').insertAdjacentHTML('beforeend','<p>3D engine could not load. Please check your connection.</p>');return}
+if(!window.THREE){$('homePanel').insertAdjacentHTML('beforeend','<p style="color:#ffbd75">3D engine unavailable: check your internet connection and reload. The race has not been replaced with a 2D simulation.</p>');return}
 let scene,camera,renderer,clock=new THREE.Clock(),ship,shipGroup,track,stars,planet,ring;
 let decor=[],traffic=[],crystals=[],lane=1,targetLane=1,score=0,crystalCount=0,best=Number(localStorage.getItem('gxRaceBest')||0),bank=Number(localStorage.getItem('gxCrystalBank')||0);
 let running=false,paused=false,finished=false,boost=false,speed=52,elapsed=0,spawnTimer=0,hitCooldown=0,noticeTimer=0;
@@ -131,7 +131,7 @@ function addTraffic(type,laneIndex,z){
 }
 function resetRace(){
  traffic.forEach(o=>scene.remove(o));traffic=[];lane=1;targetLane=1;shipGroup.position.set(0,-1.5,5);score=0;crystalCount=0;elapsed=0;spawnTimer=.5;hitCooldown=0;speed=52;boost=false;finished=false;paused=false;
- $('score').textContent='0';$('combo').textContent='CRYSTALS 0';$('notice').classList.remove('on');$('pauseStrip').style.display='none';$('finishStrip').style.display='none';
+ $('score').textContent='0';$('combo').textContent='CRYSTALS 0';$('timer').textContent='75';$('notice').classList.remove('on');$('pauseStrip').style.display='none';$('finishStrip').style.display='none';
 }
 function startRace(){resetRace();running=true;$('home').style.display='none';$('raceHud').style.display='block';clock.getDelta()}
 function changeLane(n){if(!running||paused||finished)return;targetLane=Math.max(0,Math.min(2,targetLane+n));}
@@ -154,7 +154,7 @@ function tick(dt){
  if(hitCooldown>0)hitCooldown-=dt;if(noticeTimer>0){noticeTimer-=dt;if(noticeTimer<=0)$('notice').classList.remove('on')}
  score+=Math.floor(dt*(boost?18:10));$('score').textContent=score.toLocaleString();
  $('speedline').textContent=(boost?'BOOST ENGAGED':'WARP SPEED')+'　/　'+Math.round(speed*3.6)+' KM/H';
- if(elapsed>=75)finish();
+ $('timer').textContent=Math.max(0,Math.ceil(75-elapsed));if(elapsed>=75)finish();
 }
 function loop(){requestAnimationFrame(loop);let dt=Math.min(clock.getDelta(),.05);if(running&&!paused&&!finished)tick(dt);renderer.render(scene,camera)}
 $('play').onclick=startRace;$('leftBtn').addEventListener('pointerdown',e=>{e.preventDefault();changeLane(-1)});$('rightBtn').addEventListener('pointerdown',e=>{e.preventDefault();changeLane(1)});
